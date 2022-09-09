@@ -20,7 +20,7 @@ namespace TasksForJunior
             char potionIndicator = 'H';
             string unitNames = "Drunk Tree";*/
 
-            Console.WriteLine("Добрый день!");
+            /*Console.WriteLine("Добрый день!");
             Console.Write("Как к вам можно обращатся (укажите свае имя): ");
             string userName = Console.ReadLine();
             Console.WriteLine("Очень приятно! Меня завут БОТ.");
@@ -39,7 +39,17 @@ namespace TasksForJunior
             Console.WriteLine("Вас зовут {0}, Ваш возраст {1} лет, " +
                 "последнее место работы {2} и ваш пол {3}", 
                 userName, userAge, userPlaceOfWork, userGender);
-            Console.ReadLine();
+            Console.ReadLine();*/
+
+            sbyte userPictures = 52;
+            sbyte picturesInRow = 3;
+            sbyte numberOfRows;
+            numberOfRows = Convert.ToSByte(userPictures / picturesInRow);
+            sbyte cortinasBeyondMeasure = Convert.ToSByte(userPictures % picturesInRow);
+            Console.WriteLine("Чтобы повесить {0} картины по {1} в каждом ряду " +
+                "необходимо {2} рядов. Количество картин которые не поместились {3}" +
+                " для полного заполнения ряда",
+                userPictures, picturesInRow, numberOfRows, cortinasBeyondMeasure);
         }
     }
 }
