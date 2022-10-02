@@ -7,23 +7,23 @@ namespace TasksForJunior
     {
         static void Main()
         {
-            const string FullName = "name";
-            const string JobTitle = "title";
-            const string Full = "full";
-            const string AddEmployee = "add";
-            const string DeleteEmployee = "delete";
-            const string Exit = "exit";
+            const string CommandFullName = "name";
+            const string CommandJobTitle = "title";
+            const string CommandFull = "full";
+            const string CommandAddEmployee = "add";
+            const string CommandDeleteEmployee = "delete";
+            const string CommandExit = "exit";
             string[] fullName = new string[0];
             string[] jobTitle = new string[0];
             bool isWork = true;
 
             Console.WriteLine($"Добро пожаловать в программу по составлениею досье на сотрудника:\n" +
-                $"для просмотра списка сотрудников наберите команду {FullName}\n" +
-                $"для просмотра профессий на предприятии наберите команду {JobTitle}\n" +
-                $"для просмотра команды предприятия (Ф.И.О сотрудника - должность) наберите команду {Full}\n" +
-                $"для добовления сотрудника наберите команду {AddEmployee}\n" +
-                $"для удалить сотрудника наберите команду {DeleteEmployee}.\n" +
-                $"для выхода и программы наберите команду {Exit}");
+                $"для просмотра списка сотрудников наберите команду {CommandFullName}\n" +
+                $"для просмотра профессий на предприятии наберите команду {CommandJobTitle}\n" +
+                $"для просмотра команды предприятия (Ф.И.О сотрудника - должность) наберите команду {CommandFull}\n" +
+                $"для добовления сотрудника наберите команду {CommandAddEmployee}\n" +
+                $"для удалить сотрудника наберите команду {CommandDeleteEmployee}.\n" +
+                $"для выхода и программы наберите команду {CommandExit}");
 
             while (isWork)
             {
@@ -32,26 +32,26 @@ namespace TasksForJunior
 
                 switch (command)
                 {
-                    case Exit:
+                    case CommandExit:
                         isWork = false;
                         break;
-                    case AddEmployee:
+                    case CommandAddEmployee:
                         AddsEmployee(ref fullName, ref jobTitle);
                         break;
-                    case DeleteEmployee:
+                    case CommandDeleteEmployee:
                         DeletesEmployee(ref fullName, ref jobTitle);
                         break;
-                    case Full:
+                    case CommandFull:
                         TeamView(fullName, jobTitle);
                         break;
-                    case FullName:
+                    case CommandFullName:
                         ViewEmployees(fullName);
                         break;
-                    case JobTitle:
+                    case CommandJobTitle:
                         ViewingPositions(jobTitle);
                         break;
                     default:
-                        Console.WriteLine($"Вы неправильно набрали команду! Повторите еще раз или наберите {Exit} " +
+                        Console.WriteLine($"Вы неправильно набрали команду! Повторите еще раз или наберите {CommandExit} " +
                             $"для выхода из программы.");
                         break;
                 }
@@ -199,7 +199,7 @@ namespace TasksForJunior
 
         static void AddsEmployee(ref string[] fullName, ref string[] jobTitle)
         {
-            Console.Write("Введите фамилию и имя нового сотрудника:");
+            Console.Write("Введите фамилию, имя и отчество нового сотрудника через пробел: ");
             fullName = ArrayGrowth(fullName);
             fullName[fullName.Length - 1] = Console.ReadLine();
             Console.Write("Введите должность вашего сотрудника: ");
@@ -215,7 +215,7 @@ namespace TasksForJunior
             }
             else
             {
-                Console.Write("Для удаления сотрудника введите его порядковый номер или фамилию: ");
+                Console.Write("Для удаления сотрудника введите его порядковый номер или ФИО: ");
                 string temp = Console.ReadLine();
                 int number;
 
