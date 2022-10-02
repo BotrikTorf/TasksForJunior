@@ -215,7 +215,7 @@ namespace TasksForJunior
             }
             else
             {
-                Console.Write("Для удаления сотрудника введите его порядковый номер или ФИО: ");
+                Console.Write("Для удаления сотрудника введите его порядковый номер или фамилию: ");
                 string temp = Console.ReadLine();
                 int number;
 
@@ -228,7 +228,7 @@ namespace TasksForJunior
                 {
                     for (int i = 0; i < fullName.Length; i++)
                     {
-                        if (fullName[i] == temp)
+                        if (ReturnsLastName(fullName[i]) == temp)
                         {
                             fullName[i] = null;
                             jobTitle[i] = null;
@@ -239,6 +239,12 @@ namespace TasksForJunior
                 fullName = DeletesEmptyEntry(fullName);
                 jobTitle = DeletesEmptyEntry(jobTitle);
             }
+        }
+
+        static string ReturnsLastName(string name)
+        {
+            string[] fullName = name.Split(new char[] {' '});
+            return fullName[0];
         }
     }
 }
