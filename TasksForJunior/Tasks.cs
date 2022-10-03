@@ -7,25 +7,31 @@ namespace TasksForJunior
     {
         static void Main()
         {
-            bool isRight;
+            string number = null;
 
             Console.Write("Введите число:");
-            isRight = int.TryParse(Console.ReadLine(), out int number);
 
-            while (!isRight)
+            while (!ConvertsNunber(Console.ReadLine(), ref number))
             {
-                Console.WriteLine("Вы набрали вместа числа стова!");
+                Console.WriteLine("Вы набрали вместо числа слово!");
                 Console.Write("Введите число:");
-                string text = Console.ReadLine();
-                isRight = int.TryParse(text, out int numberRun);
-
-                if (isRight)
-                {
-                    number = numberRun;
-                }
             }
 
             Console.WriteLine($"Вы набрали число {number}");
+        }
+
+        static bool ConvertsNunber(string text, ref string number)
+        {
+            if (int.TryParse(text, out int tempNumber))
+            {
+                number = tempNumber.ToString();
+                return true;
+            }
+            else
+            {
+                number = text;
+                return false;
+            }
         }
     }
 }
