@@ -7,20 +7,18 @@ namespace TasksForJunior
     {
         static void Main()
         {
-            const string CommandFullName = "name";
-            const string CommandJobTitle = "title";
             const string CommandFull = "full";
             const string CommandAddEmployee = "add";
             const string CommandDeleteEmployee = "delete";
             const string CommandExit = "exit";
-            string[] fullName = new string[0];
-            string[] jobTitle = new string[0];
+            const string CommandLastNameSearch = "search";
+            string[] fullNames = new string[0];
+            string[] jobTitles = new string[0];
             bool isWork = true;
 
             Console.WriteLine($"Добро пожаловать в программу по составлениею досье на сотрудника:\n" +
-                $"для просмотра списка сотрудников наберите команду {CommandFullName}\n" +
-                $"для просмотра профессий на предприятии наберите команду {CommandJobTitle}\n" +
                 $"для просмотра команды предприятия (Ф.И.О сотрудника - должность) наберите команду {CommandFull}\n" +
+                $"для поиски сотрудника по фамилии наберите команду {CommandLastNameSearch}\n" +
                 $"для добовления сотрудника наберите команду {CommandAddEmployee}\n" +
                 $"для удалить сотрудника наберите команду {CommandDeleteEmployee}.\n" +
                 $"для выхода и программы наберите команду {CommandExit}");
@@ -36,19 +34,16 @@ namespace TasksForJunior
                         isWork = false;
                         break;
                     case CommandAddEmployee:
-                        AddsEmployee(ref fullName, ref jobTitle);
+                        AddsEmployee(ref fullNames, ref jobTitles);
                         break;
                     case CommandDeleteEmployee:
-                        DeletesEmployee(ref fullName, ref jobTitle);
+                        DeletesEmployee(ref fullNames, ref jobTitles);
                         break;
                     case CommandFull:
-                        TeamView(fullName, jobTitle);
+                        TeamView(fullNames, jobTitles);
                         break;
-                    case CommandFullName:
-                        ViewEmployees(fullName);
-                        break;
-                    case CommandJobTitle:
-                        ViewingPositions(jobTitle);
+                    case CommandLastNameSearch:
+                        LastNameSearch(fullNames);
                         break;
                     default:
                         Console.WriteLine($"Вы неправильно набрали команду! Повторите еще раз или наберите {CommandExit} " +
@@ -58,94 +53,35 @@ namespace TasksForJunior
             }
         }
 
-        private static void ViewingPositions(string[] jobTitle)
+        private static void LastNameSearch(string[] fullNames)
         {
-            if (jobTitle.Length == 0)
+            string tempLastName = null;
+            Console.Write("Ведите фамилию сотрудника которого вы хотите найти в спаске: ");
+            string lastName = Console.ReadLine();
+
+            foreach (string names in fullNames)
             {
-                Console.WriteLine("У вас никто не работает!");
+                if (ReturnsLastName(names.ToLower()) == lastName.ToLower())
+                    tempLastName = names;
             }
+
+            if (tempLastName != null)
+                Console.WriteLine($"Есть сотрудник с фамилией {lastName}, его ФИО: {tempLastName}");
             else
-            {
-                string[,] temp = new string[1, 2];
-                temp[0, 0] = "1";
-                temp[0, 1] = jobTitle[0];
-
-                for (int i = 1; i < jobTitle.Length; i++)
-                {
-                    string stringTemp = jobTitle[i];
-                    bool isNewProfession = true;
-
-                    for (int j = 0; j < temp.GetLength(0); j++)
-                    {
-                        if (stringTemp == temp[j, 1])
-                        {
-                            isNewProfession = false;
-                        }
-                    }
-
-                    if (isNewProfession)
-                    {
-                        string[,] tempArray = new string[temp.GetLength(0) + 1, temp.GetLength(1)];
-
-                        for (int j = 0; j < temp.GetLength(0); j++)
-                        {
-                            for (int l = 0; l < temp.GetLength(1); l++)
-                            {
-                                tempArray[j, l] = temp[j, l];
-                            }
-                        }
-
-                        temp = tempArray;
-                        temp[temp.GetLength(0) - 1, 0] = "1";
-                        temp[temp.GetLength(0) - 1, 1] = jobTitle[i];
-                    }
-                    else
-                    {
-                        for (int j = 0; j < temp.GetLength(0); j++)
-                        {
-                            if (temp[j, 1] == jobTitle[i])
-                            {
-                                temp[j, 0] = (int.Parse(temp[j, 0]) + 1).ToString();
-                            }
-                        }
-                    }
-                }
-
-                Console.WriteLine("У вас работает:");
-
-                for (int i = 0; i < temp.GetLength(0); i++)
-                {
-                    Console.WriteLine($"{temp[i, 0]} человек по професии {temp[i, 1]};");
-                }
-            }
+                Console.WriteLine($"Сотрудника с фамилией {lastName} в списке сотрудников нет!");
         }
 
-        static void ViewEmployees(string[] fullName)
+        static void TeamView(string[] fullNames, string[] jobTitles)
         {
-            if (fullName.Length == 0)
+            if (jobTitles.Length == 0)
             {
                 Console.WriteLine("У вас никто не работает!");
             }
             else
             {
-                for (int i = 0; i < fullName.Length; i++)
+                for (int i = 0; i < fullNames.Length; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {fullName[i]}");
-                }
-            }
-        }
-
-        static void TeamView(string[] fullName, string[] jobTitle)
-        {
-            if (jobTitle.Length == 0)
-            {
-                Console.WriteLine("У вас никто не работает!");
-            }
-            else
-            {
-                for (int i = 0; i < fullName.Length; i++)
-                {
-                    Console.WriteLine($"{i + 1}. {fullName[i]}\t - {jobTitle[i]}");
+                    Console.WriteLine($"{i + 1}. {fullNames[i]}\t - {jobTitles[i]}");
                 }
             }
         }
@@ -197,53 +133,53 @@ namespace TasksForJunior
             }
         }
 
-        static void AddsEmployee(ref string[] fullName, ref string[] jobTitle)
+        static void AddsEmployee(ref string[] fullNames, ref string[] jobTitles)
         {
             Console.Write("Введите фамилию, имя и отчество нового сотрудника через пробел: ");
-            fullName = ArrayGrowth(fullName);
-            fullName[fullName.Length - 1] = Console.ReadLine();
+            fullNames = ArrayGrowth(fullNames);
+            fullNames[fullNames.Length - 1] = Console.ReadLine();
             Console.Write("Введите должность вашего сотрудника: ");
-            jobTitle = ArrayGrowth(jobTitle);
-            jobTitle[jobTitle.Length - 1] = Console.ReadLine();
+            jobTitles = ArrayGrowth(jobTitles);
+            jobTitles[jobTitles.Length - 1] = Console.ReadLine();
         }
 
-        static void DeletesEmployee(ref string[] fullName, ref string[] jobTitle)
+        static void DeletesEmployee(ref string[] fullNames, ref string[] jobTitles)
         {
-            if (jobTitle.Length == 0)
+            if (jobTitles.Length == 0)
             {
                 Console.WriteLine("У вас никто не работает");
             }
             else
             {
                 Console.Write("Для удаления сотрудника введите его порядковый номер или фамилию: ");
-                string temp = Console.ReadLine();
+                string stringInput = Console.ReadLine();
                 int number;
 
-                if (int.TryParse(temp, out number))
+                if (int.TryParse(stringInput, out number))
                 {
-                    fullName[number - 1] = null;
-                    jobTitle[number - 1] = null;
+                    fullNames[number - 1] = null;
+                    jobTitles[number - 1] = null;
                 }
                 else
                 {
-                    for (int i = 0; i < fullName.Length; i++)
+                    for (int i = 0; i < fullNames.Length; i++)
                     {
-                        if (ReturnsLastName(fullName[i]) == temp)
+                        if (ReturnsLastName(fullNames[i]) == stringInput)
                         {
-                            fullName[i] = null;
-                            jobTitle[i] = null;
+                            fullNames[i] = null;
+                            jobTitles[i] = null;
                         }
                     }
                 }
 
-                fullName = DeletesEmptyEntry(fullName);
-                jobTitle = DeletesEmptyEntry(jobTitle);
+                fullNames = DeletesEmptyEntry(fullNames);
+                jobTitles = DeletesEmptyEntry(jobTitles);
             }
         }
 
         static string ReturnsLastName(string name)
         {
-            string[] fullName = name.Split(new char[] {' '});
+            string[] fullName = name.Split(new char[] { ' ' });
             return fullName[0];
         }
     }
