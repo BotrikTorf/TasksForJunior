@@ -1,37 +1,37 @@
 ﻿using System;
 
-
 namespace TasksForJunior
 {
     class Tasks
     {
         static void Main()
         {
-            string number = null;
-
-            Console.Write("Введите число:");
-
-            while (!ConvertsNunber(Console.ReadLine(), ref number))
-            {
-                Console.WriteLine("Вы набрали вместо числа слово!");
-                Console.Write("Введите число:");
-            }
-
-            Console.WriteLine($"Вы набрали число {number}");
+            Console.Write("Введите число: ");
+            string textNumber = Console.ReadLine();
+            Console.WriteLine($"Вы набрали число {ReadNumber(textNumber)}");
         }
 
-        static bool ConvertsNunber(string text, ref string number)
+        private static int ReadNumber(string textNumber)
         {
-            if (int.TryParse(text, out int tempNumber))
+            int numberTemp = 0;
+            bool isRead = true;
+
+            while (isRead)
             {
-                number = tempNumber.ToString();
-                return true;
+                if (int.TryParse(textNumber, out int number))
+                {
+                    numberTemp = number;
+                    isRead = false;
+                }
+                else
+                {
+                    Console.WriteLine("Вы ввели не правельно число!");
+                    Console.Write("Введите число: ");
+                    textNumber = Console.ReadLine();
+                }
             }
-            else
-            {
-                number = text;
-                return false;
-            }
+
+            return numberTemp;
         }
     }
 }
