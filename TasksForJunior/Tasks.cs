@@ -70,38 +70,28 @@ namespace TasksForJunior
             Console.Write($"Координаты начального положения зависит от длины полоски {name}.\n" +
                 $"Вы можете расположить начало полоски {name} от 0 до {xMaxBar} по горизонтали, " +
                 $"введите значение: ");
-            xPosition = Convert.ToInt32(Console.ReadLine());
-
-            if (xPosition < 0 || xPosition > xMaxBar)
-            {
-                bool isRepeatInput = true;
-
-                while (isRepeatInput)
-                {
-                    Console.Write($"Вы неправельно ввели значение. Повторите еще раз: ");
-                    xPosition = Convert.ToInt32(Console.ReadLine());
-
-                    if (xPosition >= 0 && xPosition <= xMaxBar)
-                        isRepeatInput = false;
-                }
-            }
+            xPosition = SetStartPosition(xMaxBar);
 
             Console.Write($"Введите значение по вертикали (не может быть больше высоты окна {Console.WindowHeight}): ");
-            yPosition = Convert.ToInt32(Console.ReadLine());
+            yPosition = SetStartPosition(Console.WindowHeight);
+        }
 
-            if (yPosition < 0 || yPosition > Console.WindowHeight)
+        private static int SetStartPosition(int maxBar)
+        {
+            bool isRepeatInput = true;
+            int position = 0;
+
+            while (isRepeatInput)
             {
-                bool isRepeatInput = true;
+                position = Convert.ToInt32(Console.ReadLine());
 
-                while (isRepeatInput)
-                {
+                if (position > 0 && position < maxBar)
+                    isRepeatInput = false;
+                else
                     Console.Write($"Вы неправельно ввели значение. Повторите еще раз: ");
-                    yPosition = Convert.ToInt32(Console.ReadLine());
-
-                    if (yPosition >= 0 && yPosition <= Console.WindowHeight)
-                        isRepeatInput = false;
-                }
             }
+
+            return position;
         }
     }
 }
