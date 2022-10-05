@@ -45,7 +45,7 @@ namespace TasksForJunior
                         TeamView( fullNames, jobTitles);
                         break;
                     case CommandLastNameSearch:
-                        SearchLastName(fullNames);
+                        SearchFullName(fullNames);
                         break;
                     default:
                         Console.WriteLine($"Вы неправильно набрали команду! Повторите еще раз или наберите {CommandExit} " +
@@ -55,7 +55,7 @@ namespace TasksForJunior
             }
         }
 
-        private static void SearchLastName(string[] fullNames)
+        private static void SearchFullName(string[] fullNames)
         {
             bool haveEmployee = false;
             Console.Write("Ведите фамилию сотрудника которого вы хотите найти в спаске: ");
@@ -89,14 +89,13 @@ namespace TasksForJunior
             }
         }
 
-        static string[] ArrayGrowth(string[] array)
+        static string[] GrowthArray(string[] array)
         {
-            string[] temp = array;
-            string[] arrayReady = new string[temp.Length + 1];
+            string[] arrayReady = new string[array.Length + 1];
 
-            for (int i = 0; i < temp.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                arrayReady[i] = temp[i];
+                arrayReady[i] = array[i];
             }
 
             return arrayReady;
@@ -129,10 +128,10 @@ namespace TasksForJunior
         static void AddsEmployee(ref string[] fullNames, ref string[] jobTitles)
         {
             Console.Write("Введите фамилию, имя и отчество нового сотрудника через пробел: ");
-            fullNames = ArrayGrowth(fullNames);
+            fullNames = GrowthArray(fullNames);
             fullNames[fullNames.Length - 1] = Console.ReadLine();
             Console.Write("Введите должность вашего сотрудника: ");
-            jobTitles = ArrayGrowth(jobTitles);
+            jobTitles = GrowthArray(jobTitles);
             jobTitles[jobTitles.Length - 1] = Console.ReadLine();
         }
 
