@@ -29,10 +29,10 @@ namespace TasksForJunior
             Console.WindowHeight = 29;
             Console.WindowWidth = 150;
 
-            ShowQuestions(ref lengthHealthBar, ref xMaxHealthBar, ref lengthFillingHealth, ref xPositionHealth,
+            SetOptionsBar(ref lengthHealthBar, ref xMaxHealthBar, ref lengthFillingHealth, ref xPositionHealth,
             ref yPositionHealth, Health);
 
-            ShowQuestions(ref lengthManaBar, ref xMaxManaBar, ref lengthFillingMana, ref xPositionMana,
+            SetOptionsBar(ref lengthManaBar, ref xMaxManaBar, ref lengthFillingMana, ref xPositionMana,
             ref yPositionMana, Mana);
 
             ShowBar(xPositionHealth, yPositionHealth, lengthHealthBar, lengthFillingHealth, colorHealth);
@@ -58,7 +58,7 @@ namespace TasksForJunior
             Console.WriteLine();
         }
 
-        static void ShowQuestions(ref int lengthBar, ref int xMaxBar, ref int lengthFilling, ref int xPosition, 
+        static void SetOptionsBar(ref int lengthBar, ref int xMaxBar, ref int lengthFilling, ref int xPosition, 
             ref int yPosition, string name)
         {
             Console.Write($"Введите длину полоски {name} (она должна быть не больше 150 знаков): ");
