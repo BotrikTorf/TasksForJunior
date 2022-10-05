@@ -43,7 +43,7 @@ namespace TasksForJunior
                         TeamView(fullNames, jobTitles);
                         break;
                     case CommandLastNameSearch:
-                        LastNameSearch(fullNames);
+                        SearchLastName(fullNames);
                         break;
                     default:
                         Console.WriteLine($"Вы неправильно набрали команду! Повторите еще раз или наберите {CommandExit} " +
@@ -53,21 +53,22 @@ namespace TasksForJunior
             }
         }
 
-        private static void LastNameSearch(string[] fullNames)
+        private static void SearchLastName(string[] fullNames)
         {
-            string tempLastName = null;
+            bool haveEmployee = false;
             Console.Write("Ведите фамилию сотрудника которого вы хотите найти в спаске: ");
             string lastName = Console.ReadLine();
 
-            foreach (string names in fullNames)
+            for (int i = 0; i < fullNames.Length; i++)
             {
-                if (ReturnsLastName(names.ToLower()) == lastName.ToLower())
-                    tempLastName = names;
+                if (lastName.ToLower() == ReturnsLastName(fullNames[i]))
+                {
+                    Console.WriteLine(fullNames[i]);
+                    haveEmployee = true;
+                }
             }
 
-            if (tempLastName != null)
-                Console.WriteLine($"Есть сотрудник с фамилией {lastName}, его ФИО: {tempLastName}");
-            else
+            if (haveEmployee == false)
                 Console.WriteLine($"Сотрудника с фамилией {lastName} в списке сотрудников нет!");
         }
 
@@ -151,26 +152,47 @@ namespace TasksForJunior
             }
             else
             {
-                Console.Write("Для удаления сотрудника введите его порядковый номер или фамилию: ");
-                string stringInput = Console.ReadLine();
-                int number;
+                bool isTemp = true;
 
-                if (int.TryParse(stringInput, out number))
+                while (isTemp)
                 {
-                    fullNames[number - 1] = null;
-                    jobTitles[number - 1] = null;
-                }
-                else
-                {
-                    for (int i = 0; i < fullNames.Length; i++)
+                    Console.Write("Для удаления сотрудника введите его порядковый номер или ФИО: ");
+                    string stringInput = Console.ReadLine();
+
+
+                    if (int.TryParse(stringInput, out int number))
                     {
-                        if (ReturnsLastName(fullNames[i]) == stringInput)
+                        if (number <= fullNames.Length && number >= 1)
                         {
-                            fullNames[i] = null;
-                            jobTitles[i] = null;
+                            fullNames[number - 1] = null;
+                            jobTitles[number - 1] = null;
+                            isTemp = false;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Вы ввели не правельно номер!");
+                        }
+
+                    }
+                    else
+                    {
+                        for (int i = 0; i < fullNames.Length; i++)
+                        {
+                            if (fullNames[i].ToLower() == stringInput.ToLower())
+                            {
+                                fullNames[i] = null;
+                                jobTitles[i] = null;
+                                isTemp = false;
+                            }
+                        }
+
+                        if (isTemp)
+                        {
+                            Console.WriteLine("Вы ввели неправельно фамилию!");
                         }
                     }
                 }
+
 
                 fullNames = DeletesEmptyEntry(fullNames);
                 jobTitles = DeletesEmptyEntry(jobTitles);
@@ -180,7 +202,7 @@ namespace TasksForJunior
         static string ReturnsLastName(string name)
         {
             string[] fullName = name.Split(new char[] { ' ' });
-            return fullName[0];
+            return fullName[0].ToLower();
         }
     }
 }
