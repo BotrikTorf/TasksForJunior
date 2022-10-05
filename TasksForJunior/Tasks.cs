@@ -12,8 +12,10 @@ namespace TasksForJunior
             const string CommandDeleteEmployee = "delete";
             const string CommandExit = "exit";
             const string CommandLastNameSearch = "search";
-            string[] fullNames = new string[0];
-            string[] jobTitles = new string[0];
+            //string[] fullNames = new string[0];
+            //string[] jobTitles = new string[0];
+            string[] fullNames = { "qwe ewq", "wer rew", "ert tre", "rty ytr", "tyu uyt", "yui iuy" };
+            string[] jobTitles = { "qaz", "wsx", "qaz", "wsx", "edc", "rfv" };
             bool isWork = true;
 
             Console.WriteLine($"Добро пожаловать в программу по составлениею досье на сотрудника:\n" +
@@ -40,7 +42,7 @@ namespace TasksForJunior
                         DeletesEmployee(ref fullNames, ref jobTitles);
                         break;
                     case CommandFull:
-                        TeamView(fullNames, jobTitles);
+                        TeamView( fullNames, jobTitles);
                         break;
                     case CommandLastNameSearch:
                         SearchLastName(fullNames);
@@ -100,25 +102,16 @@ namespace TasksForJunior
             return arrayReady;
         }
 
-        static string[] DeletesEmptyEntry(string[] array)
+        static string[] DeletesEmptyEntry(string[] array, int indexArray)
         {
             string[] temp = new string[array.Length - 1];
             int number = 0;
-            bool thereEmptyCells = false;
 
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (array[i] == null)
-                {
-                    thereEmptyCells = true;
-                }
-            }
-
-            if (thereEmptyCells)
+            if (indexArray >= 0 && indexArray <= array.Length)
             {
                 for (int i = 0; i < array.Length; i++)
                 {
-                    if (array[i] != null)
+                    if (indexArray != i)
                     {
                         temp[number] = array[i];
                         number++;
@@ -129,7 +122,6 @@ namespace TasksForJunior
             }
             else
             {
-                Console.WriteLine("Пустых записей нет!");
                 return array;
             }
         }
@@ -159,43 +151,41 @@ namespace TasksForJunior
                     Console.Write("Для удаления сотрудника введите его порядковый номер или ФИО: ");
                     string stringInput = Console.ReadLine();
 
-
                     if (int.TryParse(stringInput, out int number))
-                    {
-                        if (number <= fullNames.Length && number >= 1)
-                        {
-                            fullNames[number - 1] = null;
-                            jobTitles[number - 1] = null;
-                            isTemp = false;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Вы ввели не правельно номер!");
-                        }
-
-                    }
+                        DeleteByNumber(ref isTemp, ref fullNames, ref jobTitles, number);
                     else
-                    {
-                        for (int i = 0; i < fullNames.Length; i++)
-                        {
-                            if (fullNames[i].ToLower() == stringInput.ToLower())
-                            {
-                                fullNames[i] = null;
-                                jobTitles[i] = null;
-                                isTemp = false;
-                            }
-                        }
-
-                        if (isTemp)
-                        {
-                            Console.WriteLine("Вы ввели неправельно фамилию!");
-                        }
-                    }
+                        DeleteByFullName(ref isTemp, ref fullNames, ref jobTitles, stringInput);
                 }
+            }
+        }
 
+        private static void DeleteByFullName(ref bool isTemp, ref string[] fullNames, ref string[] jobTitles, string stringInput)
+        {
+            for (int i = 0; i < fullNames.Length; i++)
+            {
+                if (fullNames[i].ToLower() == stringInput.ToLower())
+                {
+                    fullNames = DeletesEmptyEntry(fullNames, i);
+                    jobTitles = DeletesEmptyEntry(jobTitles, i);
+                    isTemp = false;
+                }
+            }
 
-                fullNames = DeletesEmptyEntry(fullNames);
-                jobTitles = DeletesEmptyEntry(jobTitles);
+            if (isTemp)
+                Console.WriteLine("Вы ввели неправельно ФИО!");
+        }
+
+        private static void DeleteByNumber(ref bool isTemp, ref string[] fullNames, ref string[] jobTitles, int number)
+        {
+            if (number <= fullNames.Length && number >= 1)
+            {
+                fullNames = DeletesEmptyEntry(fullNames, number - 1);
+                jobTitles = DeletesEmptyEntry(jobTitles, number - 1);
+                isTemp = false;
+            }
+            else
+            {
+                Console.WriteLine("Вы ввели не правельно номер!");
             }
         }
 
