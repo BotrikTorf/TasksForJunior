@@ -9,14 +9,14 @@ namespace TasksForJunior
         {
             int[,] array = new int[10, 10];
 
-            array = FillsArray(array);
+            FillsArray(array);
             ShowArray(array);
             Console.WriteLine();
-            array = Shuffle(array);
+            Shuffle(array);
             ShowArray(array);
         }
 
-        private static int[,] Shuffle(int[,] array)
+        private static void Shuffle(int[,] array)
         {
             Random random = new Random();
 
@@ -31,8 +31,6 @@ namespace TasksForJunior
                     array[i, j] = tempNumber;
                 }
             }
-
-            return array;
         }
 
         private static void ShowArray(int[,] array)
@@ -48,7 +46,7 @@ namespace TasksForJunior
             }
         }
 
-        private static int[,] FillsArray(int[,] array)
+        private static void FillsArray(int[,] array)
         {
             for (int i = 0; i < array.GetLength(0); i++)
             {
@@ -57,8 +55,6 @@ namespace TasksForJunior
                     array[i, j] = (i + 1) * (j + 1);
                 }
             }
-
-            return array;
         }
     }
 }
