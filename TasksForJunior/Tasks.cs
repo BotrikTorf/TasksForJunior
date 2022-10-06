@@ -11,16 +11,14 @@ namespace TasksForJunior
             const string CommandAddEmployee = "add";
             const string CommandDeleteEmployee = "delete";
             const string CommandExit = "exit";
-            const string CommandLastNameSearch = "search";
-            //string[] fullNames = new string[0];
-            //string[] jobTitles = new string[0];
-            string[] fullNames = { "qwe ewq", "wer rew", "ert tre", "rty ytr", "tyu uyt", "yui iuy" };
-            string[] jobTitles = { "qaz", "wsx", "qaz", "wsx", "edc", "rfv" };
+            const string CommandSearchLastName = "search";
+            string[] fullNames = new string[0];
+            string[] jobTitles = new string[0];
             bool isWork = true;
 
             Console.WriteLine($"Добро пожаловать в программу по составлениею досье на сотрудника:\n" +
                 $"для просмотра команды предприятия (Ф.И.О сотрудника - должность) наберите команду {CommandFull}\n" +
-                $"для поиски сотрудника по фамилии наберите команду {CommandLastNameSearch}\n" +
+                $"для поиски сотрудника по фамилии наберите команду {CommandSearchLastName}\n" +
                 $"для добовления сотрудника наберите команду {CommandAddEmployee}\n" +
                 $"для удалить сотрудника наберите команду {CommandDeleteEmployee}.\n" +
                 $"для выхода и программы наберите команду {CommandExit}");
@@ -36,15 +34,15 @@ namespace TasksForJunior
                         isWork = false;
                         break;
                     case CommandAddEmployee:
-                        AddsEmployee(ref fullNames, ref jobTitles);
+                        AddEmployee(ref fullNames, ref jobTitles);
                         break;
                     case CommandDeleteEmployee:
                         DeletesEmployee(ref fullNames, ref jobTitles);
                         break;
                     case CommandFull:
-                        TeamView( fullNames, jobTitles);
+                        ShowAll( fullNames, jobTitles);
                         break;
-                    case CommandLastNameSearch:
+                    case CommandSearchLastName:
                         SearchFullName(fullNames);
                         break;
                     default:
@@ -74,7 +72,7 @@ namespace TasksForJunior
                 Console.WriteLine($"Сотрудника с фамилией {lastName} в списке сотрудников нет!");
         }
 
-        static void TeamView(string[] fullNames, string[] jobTitles)
+        static void ShowAll(string[] fullNames, string[] jobTitles)
         {
             if (jobTitles.Length == 0)
             {
@@ -125,7 +123,7 @@ namespace TasksForJunior
             }
         }
 
-        static void AddsEmployee(ref string[] fullNames, ref string[] jobTitles)
+        static void AddEmployee(ref string[] fullNames, ref string[] jobTitles)
         {
             Console.Write("Введите фамилию, имя и отчество нового сотрудника через пробел: ");
             fullNames = GrowthArray(fullNames);
@@ -151,14 +149,14 @@ namespace TasksForJunior
                     string stringInput = Console.ReadLine();
 
                     if (int.TryParse(stringInput, out int number))
-                        DeleteByNumber(ref isTemp, ref fullNames, ref jobTitles, number);
+                        DeletesEntruByNumber(ref isTemp, ref fullNames, ref jobTitles, number);
                     else
-                        DeleteByFullName(ref isTemp, ref fullNames, ref jobTitles, stringInput);
+                        DeletesEntryByFullName(ref isTemp, ref fullNames, ref jobTitles, stringInput);
                 }
             }
         }
 
-        private static void DeleteByFullName(ref bool isTemp, ref string[] fullNames, ref string[] jobTitles, string stringInput)
+        private static void DeletesEntryByFullName(ref bool isTemp, ref string[] fullNames, ref string[] jobTitles, string stringInput)
         {
             for (int i = 0; i < fullNames.Length; i++)
             {
@@ -174,7 +172,7 @@ namespace TasksForJunior
                 Console.WriteLine("Вы ввели неправельно ФИО!");
         }
 
-        private static void DeleteByNumber(ref bool isTemp, ref string[] fullNames, ref string[] jobTitles, int number)
+        private static void DeletesEntruByNumber(ref bool isTemp, ref string[] fullNames, ref string[] jobTitles, int number)
         {
             if (number <= fullNames.Length && number >= 1)
             {
