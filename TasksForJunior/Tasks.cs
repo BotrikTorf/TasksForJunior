@@ -1,11 +1,13 @@
 ﻿using System;
-using System.IO;
-
 
 namespace TasksForJunior
 {
     class Tasks
     {
+        const ConsoleKey Up = ConsoleKey.UpArrow;
+        const ConsoleKey Down = ConsoleKey.DownArrow;
+        const ConsoleKey Left = ConsoleKey.LeftArrow;
+        const ConsoleKey Right = ConsoleKey.RightArrow;
         static void Main()
         {
             bool isPlaying = true;
@@ -39,36 +41,49 @@ namespace TasksForJunior
 
             while (isPlaying)
             {
-                Console.SetCursorPosition(mobPositionX, mobPositionY);
-                Console.Write("@");
+                DrawsCharacter(mobPositionX, mobPositionY);
                 ConsoleKeyInfo key = Console.ReadKey(true);
-
-                ControlsCharacter(ref mobDirectioX, ref mobDirectioY, key);
+                ReadsKeys(ref mobDirectioX, ref mobDirectioY, key);
                 MovesMob(ref mobPositionX, ref mobPositionY, ref typeCell, mobDirectioX, mobDirectioY, mapGame);
-
-                if (typeCell == "$")
-                {
-                    food++;
-                }
-
-                if (food == foodMax)
-                {
-                    ChangesMap(mapGame);
-                    Console.Clear();
-                    DrawMap(mapGame);
-                    Console.SetCursorPosition(mobPositionX, mobPositionY);
-                    Console.Write("@");
-                    food++;
-                }
-
-                if (typeCell == "#")
-                {
-                    isPlaying = false;
-                    ShowWinGame();
-                }
+                food = CountsFood(food, typeCell);
+                OpensAccess(ref food, mobPositionX, mobPositionY, foodMax, mapGame);
+                isPlaying = IsEndsGame(isPlaying, typeCell);
             }
 
             Console.ReadLine();
+        }
+
+        private static bool IsEndsGame(bool isPlaying, string typeCell)
+        {
+            if (typeCell == "#")
+            {
+                isPlaying = false;
+                ShowWinGame();
+            }
+
+            return isPlaying;
+        }
+
+        static void OpensAccess(ref int food, int mobPositionX, int mobPositionY, int foodMax, string[,] mapGame)
+        {
+            if (food == foodMax)
+            {
+                ChangesMap(mapGame);
+                Console.Clear();
+                DrawMap(mapGame);
+                DrawsCharacter(mobPositionX, mobPositionY);
+                food++;
+            }
+        }
+
+        private static int CountsFood(int food, string typeCell)
+        {
+            if (typeCell == "$")
+            {
+                food++;
+            }
+
+            return food;
         }
 
         private static void ChangesMap(string[,] map)
@@ -85,23 +100,23 @@ namespace TasksForJunior
             }
         }
 
-        private static void ControlsCharacter(ref int mobDirectioX, ref int mobDirectioY, ConsoleKeyInfo key)
+        private static void ReadsKeys(ref int mobDirectioX, ref int mobDirectioY, ConsoleKeyInfo key)
         {
             switch (key.Key)
             {
-                case ConsoleKey.UpArrow:
+                case Up:
                     mobDirectioX = 0;
                     mobDirectioY = -1;
                     break;
-                case ConsoleKey.DownArrow:
+                case Down:
                     mobDirectioX = 0;
                     mobDirectioY = 1;
                     break;
-                case ConsoleKey.LeftArrow:
+                case Left:
                     mobDirectioX = -1;
                     mobDirectioY = 0;
                     break;
-                case ConsoleKey.RightArrow:
+                case Right:
                     mobDirectioX = 1;
                     mobDirectioY = 0;
                     break;
@@ -117,8 +132,7 @@ namespace TasksForJunior
                 mobPositionX += mobDirectioX;
                 mobPositionY += mobDirectioY;
                 typeCell = map[mobPositionY, mobPositionX];
-                Console.SetCursorPosition(mobPositionX, mobPositionY);
-                Console.Write("@");
+                DrawsCharacter(mobPositionX, mobPositionY);
             }
         }
 
@@ -170,6 +184,12 @@ namespace TasksForJunior
             }
 
             return food;
+        }
+
+        static void DrawsCharacter(int mmobPositionX, int mobPositionY)
+        {
+            Console.SetCursorPosition(mmobPositionX, mobPositionY);
+            Console.Write("@");
         }
     }
 }
