@@ -22,10 +22,12 @@ namespace TasksForJunior
             bool isWork = true;
 
             Dictionary<string, string> dictionarys = ConvertsOneArrayToDictionary(text);
-            Console.WriteLine("Если вы хотите выйти из словоря наберите команду \"exit\".");
-            key = RequestKeyword();
+            Console.WriteLine($"Если вы хотите выйти из словоря наберите команду \"{CommandExit}\".");
+
             while (isWork)
             {
+                key = RequestKeyword();
+
                 if (key == CommandExit)
                     isWork = false;
                 else
