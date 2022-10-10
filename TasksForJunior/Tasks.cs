@@ -10,6 +10,7 @@ namespace TasksForJunior
             private int _life;
             private int _manna;
             private int _weight;
+
             public Character() 
             {
                 _life = 0;
@@ -57,8 +58,8 @@ namespace TasksForJunior
             {
                 Console.WriteLine($"У персонажа {_life} очков жизни, {_manna} очков манны, его вес {_weight}.");
             }
-
         }
+
         static void Main()
         {
             Character character = new Character();
