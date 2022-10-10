@@ -26,20 +26,20 @@ namespace TasksForJunior
                 }
                 else
                 {
-                    if (inputString == CommandExit || inputString == CommandSum)
+                    if (inputString == CommandExit)
                     {
-                        if (inputString == CommandExit)
-                        {
-                            isWork = false;
-                        }
-                        else
-                        {
-                            SumArray(array);
-                        }
+                        isWork = false;
                     }
                     else
                     {
-                        Console.WriteLine("Вы не правельно ввели команду");
+                        if (inputString == CommandSum)
+                        {
+                            SumArray(array);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Вы не правельно ввели команду");
+                        }
                     }
                 }
             }
