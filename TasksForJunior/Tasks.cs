@@ -12,18 +12,19 @@ namespace TasksForJunior
             List<string> list = new List<string>();
 
             FillsArray(arrayOne);
-            FillsArray(arrayTwo);
-            MergesArray(arrayOne, arrayTwo, list);
             ShowCollection(arrayOne);
+            MergesArray(arrayOne, list);
+            FillsArray(arrayTwo);
             ShowCollection(arrayTwo);
+            MergesArray(arrayTwo, list);
             ShowColLection(list);
         }
 
         private static void ShowColLection(List<string> list)
         {
-            for (int i = 0; i < list.Count; i++)
+            foreach (var listItem in list)
             {
-                Console.Write($"{list[i]}\t");
+                Console.Write($"{listItem}\t");
             }
             Console.WriteLine();
         }
@@ -37,38 +38,13 @@ namespace TasksForJunior
             Console.WriteLine();
         }
 
-        private static void MergesArray(string[] arrayOne, string[] arrayTwo, List<string> list)
+        private static void MergesArray(string[] array, List<string> list)
         {
-            
-            for (int i = 0; i < arrayOne.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                bool thereRepetition = true;
-
-                for (int j = 0; j < list.Count; j++)
+                if (list.Contains(array[i]) == false)
                 {
-                    if (arrayOne[i] == list[j])
-                        thereRepetition = false;
-                }
-
-                if (thereRepetition)
-                {
-                    list.Add(arrayOne[i]);
-                }
-            }
-
-            for (int i = 0; i < arrayTwo.Length; i++)
-            {
-                bool thereRepetition = true;
-
-                for (int j = 0; j < list.Count; j++)
-                {
-                    if (arrayTwo[i] == list[j])
-                        thereRepetition = false;
-                }
-
-                if (thereRepetition)
-                {
-                    list.Add(arrayTwo[i]);
+                    list.Add(array[i]);
                 }
             }
         }
