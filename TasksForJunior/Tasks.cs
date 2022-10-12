@@ -78,9 +78,18 @@ namespace TasksForJunior
         {
             Console.Write("Введите ФИО работника: ");
             string fullName = Console.ReadLine();
-            Console.Write("Введите профессию работника: ");
-            string profession = Console.ReadLine();
-            dossiers.Add(fullName, profession);
+
+            if (dossiers.ContainsKey(fullName))
+            {
+                Console.WriteLine("Сотрудник с таким ФИО существует. Повторный ввод недопустим.");
+            }
+            else
+            {
+                Console.Write("Введите профессию работника: ");
+                string profession = Console.ReadLine();
+                dossiers.Add(fullName, profession);
+            }
+
         }
     }
 }
