@@ -3,6 +3,27 @@
 
 namespace TasksForJunior
 {
+
+
+    class Tasks
+    {
+        static void Main()
+        {
+            User user1 = new User(1, 3);
+            User user2 = new User();
+            user2.SetCoordinates(5, 10);
+            DrawUnit drrawUnit = new DrawUnit();
+
+            drrawUnit.AddUser(user1, '$');
+            drrawUnit.ShowUser();
+            Console.ReadKey();
+            drrawUnit.AddUser(user2, '@');
+            drrawUnit.ShowUser();
+            Console.ReadKey();
+
+        }
+    }
+
     class User
     {
         private int _coordinateX;
@@ -55,42 +76,50 @@ namespace TasksForJunior
         }
     }
 
-    class Location
+    class DrawUnit
     {
-        public User User;
+        private char _picture;
 
-        public Location()
+        public char Picture
         {
-            User = new User();
+            get
+            {
+                return _picture;
+            }
+            private set
+            {
+                if (value != ' ')
+                {
+                    _picture = value;
+                }
+            }
         }
 
-        public Location(User user)
+        public User User;
+
+        public DrawUnit()
+        {
+            User = new User();
+            _picture = ' ';
+        }
+
+        public DrawUnit(User user, char picture)
         {
             User = user;
+            Picture = picture;
+        }
+
+        public void AddUser(User user, char picture)
+        {
+            User = user;
+            Picture = picture;
         }
 
         public void ShowUser()
         {
+            Console.Clear();
             Console.SetCursorPosition(User.CoordinateY, User.CoordinateY);
-        }
-    }
-
-    class Tasks
-    {
-        static void Main()
-        {
-            User user1 = new User(1, 3);
-            User user2 = new User();
-            user2.SetCoordinates(5,10);
-            Location location1 = new Location();
-            Location location2 = new Location(user1);
-            Location location3 = new Location(user2);
-
-            location2.ShowUser();
-            Console.ReadKey();
-            location1.ShowUser();
-            Console.ReadKey();
-            location3.ShowUser();
+            Console.Write(Picture);
         }
     }
 }
