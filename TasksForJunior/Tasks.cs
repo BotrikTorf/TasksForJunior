@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace TasksForJunior
 {
     class Tasks
@@ -14,21 +13,11 @@ namespace TasksForJunior
     }
     class Player
     {
-        private string _fullName;
         private int _level;
-        private bool _isBan;
 
-        public string FullName
-        {
-            get
-            {
-                return _fullName;
-            }
-            set
-            {
-                _fullName = value;
-            }
-        }
+        public string FullNamePlayer { get; private set; }
+
+        public bool IsBanPlaeyer { get; private set; }
 
         public int Level
         {
@@ -36,46 +25,44 @@ namespace TasksForJunior
             {
                 return _level;
             }
-            set
+            private set
             {
-                if (value >= 0)
-                {
+                if (value > 0 && value <= 100)
                     _level = value;
-                }
-            }
-        }
-
-        public bool IsBan
-        {
-            get
-            {
-                return _isBan;
-            }
-            set
-            {
-                _isBan = value;
+                else
+                    _level = 1;
             }
         }
 
         public Player(string name, int level, bool isBan)
         {
-            FullName = name;
+            FullNamePlayer = name;
             Level = level;
-            IsBan = isBan;
+            IsBanPlaeyer = isBan;
+        }
+
+        public void IsBan(bool isBan)
+        {
+            IsBanPlaeyer = isBan;
+        }
+
+        public void FullName(string fullName)
+        {
+            FullNamePlayer = fullName;
         }
     }
 
     class DataBase
     {
-        Dictionary<int, Player> dataBase;
-        Random random = new Random();
+        private Dictionary<int, Player> _playerBase;
+        private Random _random = new Random();
 
         public DataBase()
         {
-            dataBase = new Dictionary<int, Player>();
+            _playerBase = new Dictionary<int, Player>();
         }
        
-        private int RandomKeyNumber
+        private int _randomKeyNumber
         {
             get
             {
@@ -84,8 +71,8 @@ namespace TasksForJunior
 
                 while (thereRepetitions)
                 {
-                    idNumber = random.Next(1000, 10000);
-                    thereRepetitions = dataBase.ContainsKey(idNumber);
+                    idNumber = _random.Next(1000, 10000);
+                    thereRepetitions = _playerBase.ContainsKey(idNumber);
                 }
 
                 return idNumber;
@@ -94,35 +81,35 @@ namespace TasksForJunior
 
         public void AddPlayer(Player player2)
         {
-            dataBase.Add(RandomKeyNumber, player2);
+            _playerBase.Add(_randomKeyNumber, player2);
         }
 
         public void AddPlayer(string name, int level, bool isBan)
         {
             Player player = new Player(name, level, isBan);
-            dataBase.Add(RandomKeyNumber, player);
+            _playerBase.Add(_randomKeyNumber, player);
         }
 
-        public void PutsInABun(int serialNumber)
+        public void SetsBun(int serialNumber)
         {
-            if (dataBase.ContainsKey(serialNumber))
-                dataBase[serialNumber].IsBan = true;
+            if (_playerBase.ContainsKey(serialNumber))
+                _playerBase[serialNumber].IsBan(true);
             else
                 Console.WriteLine($"Игрока с индивидуальным {serialNumber} не существует");
         }
 
-        public void PutsInTheBun(int serialNumber)
+        public void RemovesBun(int serialNumber)
         {
-            if (dataBase.ContainsKey(serialNumber))
-                dataBase[serialNumber].IsBan = false;
+            if (_playerBase.ContainsKey(serialNumber))
+                _playerBase[serialNumber].IsBan(false);
             else
                 Console.WriteLine($"Игрока с индивидуальным {serialNumber} не существует");
         }
 
         public void DeletesPlayer(int serialNumber)
         {
-            if (dataBase.ContainsKey(serialNumber))
-                dataBase.Remove(serialNumber);
+            if (_playerBase.ContainsKey(serialNumber))
+                _playerBase.Remove(serialNumber);
             else
                 Console.WriteLine($"Игрока с индивидуальным {serialNumber} не существует");
         }
@@ -130,13 +117,13 @@ namespace TasksForJunior
         {
             int serialNumber = 1;
 
-            foreach (var itemBase in dataBase)
+            foreach (var player in _playerBase)
             {
                 Console.WriteLine($"Порядковый номер: {serialNumber}\n" +
-                    $"Индивидуальный номер: {itemBase.Key}\n" +
-                    $"ФИО игрока: {itemBase.Value.FullName}\n" +
-                    $"Уровень игрока: {itemBase.Value.Level}\n" +
-                    $"Игрок забанен: {itemBase.Value.IsBan}\n");
+                    $"Индивидуальный номер: {player.Key}\n" +
+                    $"ФИО игрока: {player.Value.FullNamePlayer}\n" +
+                    $"Уровень игрока: {player.Value.Level}\n" +
+                    $"Игрок забанен: {player.Value.IsBanPlaeyer}\n");
                 serialNumber++;
             }
         }
