@@ -12,13 +12,11 @@ namespace TasksForJunior
             User user1 = new User(1, 3);
             User user2 = new User();
             user2.SetCoordinates(5, 10);
-            DrawUnit drrawUnit = new DrawUnit();
+            Renderer drrawUnit = new Renderer();
 
-            drrawUnit.AddUser(user1, '$');
-            drrawUnit.ShowUser();
+            drrawUnit.RendererUser(user1, '#');
             Console.ReadKey();
-            drrawUnit.AddUser(user2, '@');
-            drrawUnit.ShowUser();
+            drrawUnit.RendererUser(user2, '@');
             Console.ReadKey();
 
         }
@@ -43,6 +41,7 @@ namespace TasksForJunior
                 }
             }
         }
+
         public int CoordinateY
         {
             get
@@ -57,6 +56,7 @@ namespace TasksForJunior
                 }
             }
         }
+
         public User()
         {
             _coordinateX = 0;
@@ -76,50 +76,13 @@ namespace TasksForJunior
         }
     }
 
-    class DrawUnit
+    class Renderer
     {
-        private char _picture;
-
-        public char Picture
-        {
-            get
-            {
-                return _picture;
-            }
-            private set
-            {
-                if (value != ' ')
-                {
-                    _picture = value;
-                }
-            }
-        }
-
-        public User User;
-
-        public DrawUnit()
-        {
-            User = new User();
-            _picture = ' ';
-        }
-
-        public DrawUnit(User user, char picture)
-        {
-            User = user;
-            Picture = picture;
-        }
-
-        public void AddUser(User user, char picture)
-        {
-            User = user;
-            Picture = picture;
-        }
-
-        public void ShowUser()
+        public void RendererUser(User user, char picture)
         {
             Console.Clear();
-            Console.SetCursorPosition(User.CoordinateY, User.CoordinateY);
-            Console.Write(Picture);
+            Console.SetCursorPosition(user.CoordinateY, user.CoordinateY);
+            Console.Write(picture);
         }
     }
 }
