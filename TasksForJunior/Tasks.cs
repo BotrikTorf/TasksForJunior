@@ -11,68 +11,70 @@ namespace TasksForJunior
         {
             User user1 = new User(1, 3);
             User user2 = new User();
-            user2.SetCoordinates(5, 10);
             Renderer drrawUnit = new Renderer();
 
-            drrawUnit.RendererUser(user1, '#');
-            Console.ReadKey();
             drrawUnit.RendererUser(user2, '@');
             Console.ReadKey();
-
+            drrawUnit.RendererUser(user1, '#');
+            Console.ReadKey();
+            user2.SetCoordinates(5, 1000);
+            drrawUnit.RendererUser(user2, '@');
+            Console.ReadKey();
         }
     }
 
     class User
     {
-        private int _coordinateX;
-        private int _coordinateY;
+        public int CoordinateX { get; private set; }
 
-        public int CoordinateX
-        {
-            get
-            {
-                return _coordinateX;
-            }
-            private set
-            {
-                if (value > 0 && value <= Console.WindowWidth)
-                {
-                    _coordinateX = value;
-                }
-            }
-        }
-
-        public int CoordinateY
-        {
-            get
-            {
-                return _coordinateY;
-            }
-            private set
-            {
-                if (value > 0 && value <= Console.WindowHeight)
-                {
-                    _coordinateY = value;
-                }
-            }
-        }
+        public int CoordinateY { get; private set; }
 
         public User()
         {
-            _coordinateX = 0;
-            _coordinateX = 0;
+            CoordinateX = 0;
+            CoordinateX = 0;
         }
 
-        public User(int x, int y)
+        public User(int coordinateX, int coordinateY)
         {
-            CoordinateX = x;
-            CoordinateY = y;
+            if (ChecksPositions(coordinateX, coordinateY))
+            {
+                CoordinateX = coordinateX;
+                CoordinateY = coordinateY;
+            }
+            else
+            {
+                CoordinateX = 0;
+                CoordinateY = 0;
+            }
         }
 
-        public void SetCoordinates(int x, int y)
+        public void SetCoordinates(int coordinateX, int coordinateY)
         {
-            CoordinateX = x;
-            CoordinateY = y;
+            if (ChecksPositions(coordinateX, coordinateY))
+            {
+                CoordinateX = coordinateX;
+                CoordinateY = coordinateY;
+            }
+            else
+            {
+                CoordinateX = 0;
+                CoordinateY = 0;
+            }
+        }
+
+        private bool ChecksPositions(int coordinateX, int coordinateY)
+        {
+            if (coordinateX >= 0 && coordinateX < Console.WindowWidth && coordinateY >= 0 && coordinateY < Console.WindowHeight)
+            {
+                return true;
+            }
+            else
+            {
+                Console.SetCursorPosition(0, 10);
+                Console.WriteLine($"Координаты указаны не верно. Будут установлены координаты: CoordinateX = 0; CoordinateY = 0");
+                return false;
+            }
         }
     }
 
@@ -80,8 +82,9 @@ namespace TasksForJunior
     {
         public void RendererUser(User user, char picture)
         {
+            Console.ReadKey();
             Console.Clear();
-            Console.SetCursorPosition(user.CoordinateY, user.CoordinateY);
+            Console.SetCursorPosition(user.CoordinateX, user.CoordinateY);
             Console.Write(picture);
         }
     }
