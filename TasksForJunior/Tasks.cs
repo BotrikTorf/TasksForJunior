@@ -14,8 +14,8 @@ namespace TasksForJunior
 
     class Book
     {
-        const int DefaultNumberBook = 0;
-        const int DefaultNumberYear = 0;
+        private const int DefaultNumberBook = 0;
+        private const int DefaultNumberYear = 0;
         private int _numberPages;
         private int _yearPublishing;
         private DateTime _dateTime = new DateTime();
