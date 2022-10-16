@@ -14,6 +14,8 @@ namespace TasksForJunior
 
     class Book
     {
+        const int DefaultNumberBook = 0;
+        const int DefaultNumberYear = 0;
         private int _numberPages;
         private int _yearPublishing;
         private DateTime _dateTime = new DateTime();
@@ -22,7 +24,10 @@ namespace TasksForJunior
         public string Author { get; private set; }
         public int NumberPages
         {
-            get { return _numberPages; }
+            get 
+            { 
+                return _numberPages; 
+            }
             private set
             {
                 if (value >= 0)
@@ -31,14 +36,18 @@ namespace TasksForJunior
                 }
                 else
                 {
-                    Console.WriteLine("Количество страниц в книге не может быть отрицательным! По умолчанию присвоено значение 0 страниц");
-                    _numberPages = 0;
+                    Console.WriteLine($"Количество страниц в книге не может быть отрицательным! " +
+                        $"По умолчанию присвоено значение {DefaultNumberBook} страниц");
+                    _numberPages = DefaultNumberBook;
                 }
             }
         }
         public int YearPublishing
         {
-            get { return _yearPublishing; }
+            get 
+            { 
+                return _yearPublishing; 
+            }
             private set
             {
                 if (value <= _dateTime.Year)
@@ -47,8 +56,9 @@ namespace TasksForJunior
                 }
                 else
                 {
-                    Console.WriteLine($"Книга не может быть напечатана раньше {_dateTime.Year}. По умолчанию присвоено значение 0");
-                    _yearPublishing = 0;
+                    Console.WriteLine($"Книга не может быть напечатана раньше {_dateTime.Year}." +
+                        $" По умолчанию присвоено значение {DefaultNumberYear}");
+                    _yearPublishing = DefaultNumberYear;
                 }
             }
         }
@@ -86,8 +96,8 @@ namespace TasksForJunior
     class Library
     {
         private Dictionary<int, Book> _library;
-        Random _random = new Random();
-        private int _randomKey
+        private Random _random = new Random();
+        private int RandomKey
         {
             get
             {
@@ -116,26 +126,26 @@ namespace TasksForJunior
 
             foreach (var book in library)
             {
-                _library.Add(_randomKey, book.Value);
+                _library.Add(RandomKey, book.Value);
             }
         }
 
         public void AddBook(Book book)
         {
-            _library.Add(_randomKey, book);
+            _library.Add(RandomKey, book);
         }
 
         public void AddBook(string genre, string name, string author, int nunberPage, int yearPublishing)
         {
             Book book = new Book(genre, name, author, nunberPage, yearPublishing);
-            _library.Add(_randomKey, book);
+            _library.Add(RandomKey, book);
         }
 
         public void AddBook(Dictionary<int, Book> library)
         {
             foreach (var book in library)
             {
-                _library.Add(_randomKey, book.Value);
+                _library.Add(RandomKey, book.Value);
             }
         }
 
@@ -145,13 +155,7 @@ namespace TasksForJunior
 
             foreach (var book in _library)
             {
-                Console.WriteLine($"Порядковый номер: {idNumber}\n" +
-                    $"Индивидуальный номер: {book.Key}\n" +
-                    $"Название книги: {book.Value.Name}\n" +
-                    $"Автор книги: {book.Value.Author}\n" +
-                    $"Жанр в котором написана книга: {book.Value.Genre}\n" +
-                    $"Год издания: {book.Value.YearPublishing}\n" +
-                    $"Количество страниц в книге: {book.Value.NumberPages}\n");
+                ShowsBook(idNumber, book.Key, book.Value);
                 idNumber++;
             }
         }
@@ -164,13 +168,7 @@ namespace TasksForJunior
             {
                 if (book.Value.Name == name)
                 {
-                    Console.WriteLine($"Порядковый номер: {idNumber}\n" +
-                        $"Индивидуальный номер: {book.Key}\n" +
-                        $"Название книги: {book.Value.Name}\n" +
-                        $"Автор книги: {book.Value.Author}\n" +
-                        $"Жанр в котором написана книга: {book.Value.Genre}\n" +
-                        $"Год издания: {book.Value.YearPublishing}\n" +
-                        $"Количество страниц в книге: {book.Value.NumberPages}\n");
+                    ShowsBook(idNumber, book.Key, book.Value);
                     idNumber++;
                 }
             }
@@ -189,13 +187,7 @@ namespace TasksForJunior
             {
                 if (book.Key == key)
                 {
-                    Console.WriteLine($"Порядковый номер: {idNumber}\n" +
-                        $"Индивидуальный номер: {book.Key}\n" +
-                        $"Название книги: {book.Value.Name}\n" +
-                        $"Автор книги: {book.Value.Author}\n" +
-                        $"Жанр в котором написана книга: {book.Value.Genre}\n" +
-                        $"Год издания: {book.Value.YearPublishing}\n" +
-                        $"Количество страниц в книге: {book.Value.NumberPages}\n");
+                    ShowsBook(idNumber, book.Key, book.Value);
                     idNumber++;
                 }
             }
@@ -214,13 +206,7 @@ namespace TasksForJunior
             {
                 if (book.Value.Author == author)
                 {
-                    Console.WriteLine($"Порядковый номер: {idNumber}\n" +
-                        $"Индивидуальный номер: {book.Key}\n" +
-                        $"Название книги: {book.Value.Name}\n" +
-                        $"Автор книги: {book.Value.Author}\n" +
-                        $"Жанр в котором написана книга: {book.Value.Genre}\n" +
-                        $"Год издания: {book.Value.YearPublishing}\n" +
-                        $"Количество страниц в книге: {book.Value.NumberPages}\n");
+                    ShowsBook(idNumber, book.Key, book.Value);
                     idNumber++;
                 }
             }
@@ -239,13 +225,7 @@ namespace TasksForJunior
             {
                 if (book.Value.Genre == genre)
                 {
-                    Console.WriteLine($"Порядковый номер: {idNumber}\n" +
-                        $"Индивидуальный номер: {book.Key}\n" +
-                        $"Название книги: {book.Value.Name}\n" +
-                        $"Автор книги: {book.Value.Author}\n" +
-                        $"Жанр в котором написана книга: {book.Value.Genre}\n" +
-                        $"Год издания: {book.Value.YearPublishing}\n" +
-                        $"Количество страниц в книге: {book.Value.NumberPages}\n");
+                    ShowsBook(idNumber, book.Key, book.Value);
                     idNumber++;
                 }
             }
@@ -264,21 +244,26 @@ namespace TasksForJunior
             {
                 if (book.Value.YearPublishing == yearPublishing)
                 {
-                    Console.WriteLine($"Порядковый номер: {idNumber}\n" +
-                        $"Индивидуальный номер: {book.Key}\n" +
-                        $"Название книги: {book.Value.Name}\n" +
-                        $"Автор книги: {book.Value.Author}\n" +
-                        $"Жанр в котором написана книга: {book.Value.Genre}\n" +
-                        $"Год издания: {book.Value.YearPublishing}\n" +
-                        $"Количество страниц в книге: {book.Value.NumberPages}\n");
+                    ShowsBook(idNumber, book.Key, book.Value);
                     idNumber++;
                 }
             }
 
             if (idNumber == 1)
             {
-                Console.WriteLine($"Книги {yearPublishing} издания не найдены.");
+                Console.WriteLine($"Книги {yearPublishing} года издания не найдены.");
             }
+        }
+
+        private void ShowsBook(int idNumber, int key, Book book)
+        {
+            Console.WriteLine($"Порядковый номер: {idNumber}\n" +
+                $"Индивидуальный номер: {key}\n" +
+                $"Название книги: {book.Name}\n" +
+                $"Автор книги: {book.Author}\n" +
+                $"Жанр в котором написана книга: {book.Genre}\n" +
+                $"Год издания: {book.YearPublishing}\n" +
+                $"Количество страниц в книге: {book.NumberPages}\n");
         }
     }
 }
