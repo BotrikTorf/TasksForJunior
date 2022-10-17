@@ -20,7 +20,7 @@ namespace TasksForJunior
             Player player = new Player(namePlayer);
             Console.WriteLine();
             Deck deck = new Deck();
- 
+
             Console.WriteLine($"Правила пользования программой:\n" +
                 $"Для просмотра колоды карт наберите команду: {CommandSeeCardsDeck}\n" +
                 $"Для просмотра карт которые есть у игрока наберите команду: {CommandSeeCardsPlayer}\n" +
@@ -66,20 +66,21 @@ namespace TasksForJunior
 
         static void ChangeMaxNumberCard(Player player)
         {
-            int number;
+            int number = 0;
+            bool isNumber = false;
 
-            while (true)
+            while (isNumber == false)
             {
                 Console.Write("Укажите число карт которое может быть у игрока: ");
 
                 if (int.TryParse(Console.ReadLine(), out int tempNumber))
                 {
                     number = tempNumber;
-                    break;
+                    isNumber = true;
                 }
                 else
                 {
-                    Console.WriteLine("Вы не правильноввели число!");
+                    Console.WriteLine("Вы не правильно ввели число!");
                 }
             }
 
@@ -90,23 +91,21 @@ namespace TasksForJunior
 
     class Card
     {
-        public string CardSuit { get; private set; }
+        public string Suit { get; private set; }
 
-        public string CardValue { get; private set; }
+        public string Rank { get; private set; }
 
-        public Card(string cardSuit, string cardValue)
+        public Card(string suit, string rank)
         {
-            CardSuit = cardSuit;
-            CardValue = cardValue;
+            Suit = suit;
+            Rank = rank;
         }
     }
 
     class Deck
     {
-        private int _minCardValue = 6;
-        private int _maxCardValue = 10;
         private string[] _cardSuit = new string[] { "club", "diamond", "heart", "spade" };
-        private string[] _cardRank = new string[] { "Ase", "Jack", "King", "Queen"};
+        private string[] _cardRank = new string[] { "6", "7", "8", "9", "10", "Ase", "Jack", "King", "Queen" };
         private List<Card> _cards;
         private Random _random = new Random();
 
@@ -115,15 +114,6 @@ namespace TasksForJunior
         public Deck()
         {
             _cards = new List<Card>();
-
-            for (int i = _minCardValue; i <= _maxCardValue; i++)
-            {
-                for (int j = 0; j < _cardSuit.Length; j++)
-                {
-                    Card card = new Card(_cardSuit[j], i.ToString());
-                    _cards.Add(card);
-                }
-            }
 
             for (int i = 0; i < _cardRank.Length; i++)
             {
@@ -135,7 +125,7 @@ namespace TasksForJunior
             }
         }
 
-        public Card TakeCard()
+        public Card GiveCard()
         {
             int randomCard = _random.Next(0, _cards.Count);
             Card cardTemp = _cards[randomCard];
@@ -150,13 +140,13 @@ namespace TasksForJunior
 
         public void ShowDeck()
         {
-            if (_cards.Count >0)
+            if (_cards.Count > 0)
             {
                 Console.WriteLine("В колоде есть карты:");
 
                 foreach (var card in _cards)
                 {
-                    Console.WriteLine($"{card.CardValue} - {card.CardSuit}");
+                    Console.WriteLine($"{card.Rank} - {card.Suit}");
                 }
 
                 Console.WriteLine($"Всего карт {_cards.Count} штук.");
@@ -192,13 +182,13 @@ namespace TasksForJunior
         {
             if (_cards.Count < MaxCard && deck.CardsDeck > 0)
             {
-                _cards.Add(deck.TakeCard());
-            }    
+                _cards.Add(deck.GiveCard());
+            }
             else if (_cards.Count == MaxCard)
             {
                 Console.WriteLine($"Вы больше не можете взять карту. У вас привышен лимит в {MaxCard} карт");
             }
-            else 
+            else
             {
                 Console.WriteLine("В колоде закончились карты");
             }
@@ -206,13 +196,13 @@ namespace TasksForJunior
 
         public void ShowCard()
         {
-            if (_cards.Count>0)
+            if (_cards.Count > 0)
             {
                 Console.WriteLine("У игрока на руках есть карты:");
 
                 foreach (var card in _cards)
                 {
-                    Console.WriteLine($"{card.CardValue} - {card.CardSuit}");
+                    Console.WriteLine($"{card.Rank} - {card.Suit}");
                 }
 
                 Console.WriteLine($"Всего карт {_cards.Count} штук.");
