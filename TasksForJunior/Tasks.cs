@@ -37,16 +37,7 @@ namespace TasksForJunior
 
         public User(int coordinateX, int coordinateY)
         {
-            if (ChecksPositions(coordinateX, coordinateY))
-            {
-                CoordinateX = coordinateX;
-                CoordinateY = coordinateY;
-            }
-            else
-            {
-                CoordinateX = 0;
-                CoordinateY = 0;
-            }
+            SetCoordinates(coordinateX, coordinateY);
         }
 
         public void SetCoordinates(int coordinateX, int coordinateY)
