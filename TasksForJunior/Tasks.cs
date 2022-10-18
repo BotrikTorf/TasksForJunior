@@ -11,14 +11,14 @@ namespace TasksForJunior
         {
             User user1 = new User(1, 3);
             User user2 = new User();
-            Renderer drrawUnit = new Renderer();
+            Renderer unitDraw = new Renderer();
 
-            drrawUnit.RendererUser(user2, '@');
+            unitDraw.RendererUser(user2, '@');
             Console.ReadKey();
-            drrawUnit.RendererUser(user1, '#');
+            unitDraw.RendererUser(user1, '#');
             Console.ReadKey();
             user2.SetCoordinates(5, 1000);
-            drrawUnit.RendererUser(user2, '@');
+            unitDraw.RendererUser(user2, '@');
             Console.ReadKey();
         }
     }
