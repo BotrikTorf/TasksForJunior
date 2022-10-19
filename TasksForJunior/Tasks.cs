@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace TasksForJunior
 {
@@ -10,30 +9,20 @@ namespace TasksForJunior
         {
             const string CommandExit = "exit";
             const string CommandLookBase = "look";
-            const string CommandBunPlayer = "bun";
-            const string CommandUnbunPlayer = "unbun";
+            const string CommandBanPlayer = "ban";
+            const string CommandUnbanPlayer = "unban";
             const string CommandDeletePlayer = "delete";
             const string CommandAddPlayer = "add";
             bool isWork = true;
 
-            DataBase dataBase = new DataBase();
-
-            string[] playersName = new string[10];
-            Player[] players = new Player[10];
-
-            for (int i = 0; i < 10; i++)
-            {
-                playersName[i] = "player" + i.ToString();
-                players[i] = new Player(playersName[i], i, false);
-                dataBase.AddPlayer(players[i]);
-            }
+            Database database = new Database();
 
             Console.WriteLine("Добро пожаловать в базу данных игроков!");
             Console.WriteLine($"Для работы с базой данных игроков используются команды:\n" +
                               $"{CommandExit} - выходит из программы\n" +
                               $"{CommandLookBase} - данная команда позваляет просмотреть всю базу данных по игрокам\n" +
-                              $"{CommandBunPlayer} - данная команда ставит бан по индивидуальному номеру игрока\n" +
-                              $"{CommandUnbunPlayer} - данная команда снимает бан по индивидуальному номеру игрока\n" +
+                              $"{CommandBanPlayer} - данная команда ставит бан по индивидуальному номеру игрока\n" +
+                              $"{CommandUnbanPlayer} - данная команда снимает бан по индивидуальному номеру игрока\n" +
                               $"{CommandDeletePlayer} - команда удаляет игрока по индивидуальному номеру\n" +
                               $"{CommandAddPlayer} - добовляет игрока в базу данных.");
 
@@ -47,19 +36,19 @@ namespace TasksForJunior
                         isWork = false;
                         break;
                     case CommandLookBase:
-                        dataBase.Show();
+                        database.Show();
                         break;
-                    case CommandBunPlayer:
-                        dataBase.SetsBun();
+                    case CommandBanPlayer:
+                        database.BanPlayer();
                         break;
-                    case CommandUnbunPlayer:
-                        dataBase.RemovesBun();
+                    case CommandUnbanPlayer:
+                        database.UnbanPlayer();
                         break;
                     case CommandDeletePlayer:
-                        dataBase.DeletesPlayer();
+                        database.DeletesPlayer();
                         break;
                     case CommandAddPlayer:
-                        dataBase.AddPlayer();
+                        database.AddPlayer();
                         break;
                     default:
                         Console.WriteLine("Вы не правельно ввели команду!");
@@ -68,12 +57,16 @@ namespace TasksForJunior
             }
         }
     }
+
     class Player
     {
-        private const int MaxLevel = 100;
+        static private int _idNamber = 0;
+        public readonly int MaxLevel = 100;
+        public readonly int MinLevel = 1;
         private int _level;
         public string FullName { get; private set; }
         public bool IsBan { get; private set; }
+        public int IdNumber { get; private set; }
         public int Level
         {
             get
@@ -82,200 +75,131 @@ namespace TasksForJunior
             }
             private set
             {
-                if (value > 0 && value <= MaxLevel)
+                if (value >= MinLevel && value <= MaxLevel)
                     _level = value;
                 else
-                    _level = 1;
+                    _level = MinLevel;
             }
         }
 
-        public Player()
-        {
-            FullName = null;
-            Level = 0;
-            IsBan = true;
-        }
-
-        public Player(string name, int level, bool isBan)
+        public Player(string name, int level = 1, bool isBan = false)
         {
             FullName = name;
             Level = level;
             IsBan = isBan;
+            _idNamber++;
+            IdNumber = _idNamber;
         }
 
-        public void IsPutBan()
+        public void Ban()
         {
             IsBan = true;
         }
 
-        public void IsRemoveBan()
+        public void Unban()
         {
             IsBan = false;
         }
 
-        public void NewsFullName(string fullName)
-        {
-            FullName = fullName;
-        }
-
         public void Show()
         {
-            Console.WriteLine($"Фио игрока: {FullName}\n" +
-                              $"Уровень игрока: :{_level}\n" +
+            Console.WriteLine($"Индивидуальный номер: {IdNumber}\n" +
+                              $"ФИО игрока: {FullName}\n" +
+                              $"Уровень игрока: {_level}\n" +
                               $"Игрок забанен: {IsBan}\n");
         }
     }
 
-    class DataBase
+    class Database
     {
-        private Dictionary<int, Player> _playerBase;
-        private Random _random = new Random();
-        private int RandomKeyNumber
+        private List<Player> _playersBase;
+
+        public Database()
         {
-            get
-            {
-                bool thereRepetitions = true;
-                int idNumber = 0;
-
-                while (thereRepetitions)
-                {
-                    idNumber = _random.Next(1000, 10000);
-                    thereRepetitions = _playerBase.ContainsKey(idNumber);
-                }
-
-                return idNumber;
-            }
-        }
-
-        public DataBase()
-        {
-            _playerBase = new Dictionary<int, Player>();
-        }
-
-        public void AddPlayer(Player player2)
-        {
-            _playerBase.Add(RandomKeyNumber, player2);
-        }
-
-        public void AddPlayer(string name, int level, bool isBan)
-        {
-            Player player = new Player(name, level, isBan);
-            _playerBase.Add(RandomKeyNumber, player);
+            _playersBase = new List<Player>();
         }
 
         public void AddPlayer()
         {
-            Player player;
             Console.Write("Введите ФИО игрока которого хотите добавить: ");
             string fullName = Console.ReadLine();
-            int level = 0;
-            bool isNumber = false;
 
-            while (isNumber == false)
-            {
-                Console.Write("Введите начальный уровень игрока: ");
+            Console.Write($"Введите начальный уровень игрока, если уровень игрока не будет введен, то ему присвоется 1 уровень : ");
 
-                if (int.TryParse(Console.ReadLine(), out int result))
-                {
-                    level = result;
-                    isNumber = true;
-                }
-                else
-                {
-                    Console.WriteLine("Вы не правильно ввели число попробуйте еще раз.");
-                }
-            }
+            int.TryParse(Console.ReadLine(), out int level);
 
-            player = new Player(fullName, level, false);
+            Player player = new Player(fullName, level);
+
             Console.WriteLine("Вы добавили игрока:");
             player.Show();
-            _playerBase.Add(RandomKeyNumber, player);
+            _playersBase.Add(player);
         }
 
-        public void SetsBun()
+        public void BanPlayer()
         {
-            bool isBun = false;
+            Console.WriteLine("Введите индивидуальный номер игрока которого хотите забанить:");
 
-            while (isBun == false)
+            if (TryGetPlayer(Console.ReadLine(), out Player player))
             {
-                Console.WriteLine("Введите индивидуальный номер игрока которого хотите забанить:");
-
-                if (int.TryParse(Console.ReadLine(), out int result))
-                {
-                    if (_playerBase.ContainsKey(result))
-                    {
-                        Console.WriteLine("Вы забанили игрока:");
-                        _playerBase[result].IsPutBan();
-                        _playerBase[result].Show();
-                        isBun = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Игрока с индивидуальным {result} не существует");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Вы не ввели индивидуальный номер игрока!");
-                }
+                Console.WriteLine("Вы забанили игрока:");
+                player.Ban();
+                player.Show();
+                _playersBase.Add(player);
             }
         }
 
-        public void RemovesBun()
+        public void UnbanPlayer()
         {
-            bool isBun = false;
+            Console.WriteLine("Введите индивидуальный номер игрока которого хотите разбанить:");
 
-            while (isBun == false)
+            if (TryGetPlayer(Console.ReadLine(), out Player player))
             {
-                Console.WriteLine("Введите индивидуальный номер игрока которого хотите разбанить:");
-
-                if (int.TryParse(Console.ReadLine(), out int result))
-                {
-                    if (_playerBase.ContainsKey(result))
-                    {
-                        Console.WriteLine("Вы разбанили игрока:");
-                        _playerBase[result].IsRemoveBan();
-                        _playerBase[result].Show();
-                        isBun = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Игрока с индивидуальным {result} не существует");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Вы не ввели индивидуальный номер игрока!");
-                }
+                Console.WriteLine("Вы разбанили игрока:");
+                player.Unban();
+                player.Show();
+                _playersBase.Add(player);
             }
         }
 
         public void DeletesPlayer()
         {
-            bool isDelete = false;
+            Console.WriteLine("Введите индивидуальный номер игрока которого хотите удалить:");
 
-            while (isDelete == false)
+            if (TryGetPlayer(Console.ReadLine(), out Player player))
             {
-                Console.WriteLine("Введите индивидуальный номер игрока которого хотите удалить:");
+                Console.WriteLine("Вы удалили игрока:");
+                player.Show();
+            }
+        }
 
-                if (int.TryParse(Console.ReadLine(), out int result))
+        private bool TryGetPlayer(string idNamber, out Player player)
+        {
+            player = null;
+
+            if (int.TryParse(idNamber, out int result))
+            {
+                foreach (var playerBase in _playersBase)
                 {
-                    if (_playerBase.ContainsKey(result))
+                    if (playerBase.IdNumber == result)
                     {
-                        Console.WriteLine("Вы удалили игрока:");
-                        _playerBase[result].Show();
-                        _playerBase.Remove(result);
-                        isDelete = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Игрока с индивидуальным {result} не существует");
+                        player = playerBase;
                     }
                 }
-                else
-                {
-                    Console.WriteLine("Вы не ввели индивидуальный номер игрока!");
-                }
+            }
+            else
+            {
+                Console.WriteLine("Вы не ввели индивидуальный номер игрока!");
+            }
+
+            if (player == null)
+            {
+                Console.WriteLine($"Игрока с индивидуальным {idNamber} не существует");
+                return false;
+            }
+            else
+            {
+                _playersBase.Remove(player);
+                return true;
             }
         }
 
@@ -283,13 +207,20 @@ namespace TasksForJunior
         {
             int serialNumber = 1;
 
-            foreach (var player in _playerBase)
+            if (_playersBase.Count > 0)
             {
-                Console.WriteLine($"Порядковый номер: {serialNumber}\n" +
-                                  $"Индивидуальный номер: {player.Key}");
-                player.Value.Show();
-                serialNumber++;
+                foreach (var player in _playersBase)
+                {
+                    Console.WriteLine($"Порядковый номер: {serialNumber}");
+                    player.Show();
+                    serialNumber++;
+                }
             }
+            else
+            {
+                Console.WriteLine("В базе нет игроков!");
+            }
+
         }
     }
 }
