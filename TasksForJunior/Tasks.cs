@@ -7,85 +7,38 @@ namespace TasksForJunior
     {
         static void Main()
         {
-            const string CommandSeeCardsDeck = "deck";
-            const string CommandSeeCardsPlayer = "player";
-            const string CommandTakeCard = "take";
-            const string CommandGiveCards = "give";
-            const string CommandMaxCardPlayer = "max";
             const string CommandExit = "exit";
-            bool isWorKProgram = true;
+            bool isWorkProgram = true;
+
+            Croupier croupier = new Croupier();
 
             Console.Write("Введите имя игрока: ");
             string namePlayer = Console.ReadLine();
+
             Player player = new Player(namePlayer);
+
             Console.WriteLine();
-            Deck deck = new Deck();
+
+            Game game = new Game(croupier, player);
 
             Console.WriteLine($"Правила пользования программой:\n" +
-                $"Для просмотра колоды карт наберите команду: {CommandSeeCardsDeck}\n" +
-                $"Для просмотра карт которые есть у игрока наберите команду: {CommandSeeCardsPlayer}\n" +
-                $"По умолчанию игрок может взять не более {player.MaxCard} Для изменения максимального " +
-                $"количества карт для игрока наберите команду {CommandMaxCardPlayer}\n" +
-                $"Чтобы взять карту с колоды наберите команду {CommandTakeCard}\n" +
-                $"Чтобы вернуть карты игрока в колоду наберите команду {CommandGiveCards}\n" +
+                $"Для просмотра колоды карт наберите команду: {game.CardsDeckSee}\n" +
+                $"Для просмотра карт которые есть у игрока наберите команду: {game.CardsPlayerSee}\n" +
+                $"Чтобы взять карту с колоды наберите команду {game.CardTake}\n" +
+                $"Чтобы вернуть карту игрока в колоду наберите команду {game.CardGive}\n" +
                 $"Для завершения работы программы наберите команду {CommandExit}");
             Console.WriteLine();
 
-
-            while (isWorKProgram)
+            while (isWorkProgram)
             {
                 Console.Write("Введите команду: ");
                 string command = Console.ReadLine();
 
-                switch (command)
-                {
-                    case CommandExit:
-                        isWorKProgram = false;
-                        break;
-                    case CommandGiveCards:
-                        player.GivesCardsDeck(deck);
-                        break;
-                    case CommandMaxCardPlayer:
-                        ChangeMaxNumberCard(player);
-                        break;
-                    case CommandSeeCardsDeck:
-                        deck.ShowDeck();
-                        break;
-                    case CommandSeeCardsPlayer:
-                        player.ShowCard();
-                        break;
-                    case CommandTakeCard:
-                        player.TakesCard(deck);
-                        break;
-                    default:
-                        Console.WriteLine("Вы не правильно ввели команду. Попробуйте еще раз.");
-                        break;
-                }
-            }
-        }
-
-        static void ChangeMaxNumberCard(Player player)
-        {
-            int number = 0;
-            bool isNumber = false;
-
-            while (isNumber == false)
-            {
-                Console.Write("Укажите число карт которое может быть у игрока: ");
-
-                if (int.TryParse(Console.ReadLine(), out int tempNumber))
-                {
-                    number = tempNumber;
-                    isNumber = true;
-                }
+                if (command == CommandExit)
+                    isWorkProgram = false;
                 else
-                {
-                    Console.WriteLine("Вы не правильно ввели число!");
-                }
+                    game.GamesPlayer(command);
             }
-
-            player.ChangeMaxNumberCard(number);
-            Console.WriteLine($"Игрок может взять {player.MaxCard} карт.");
         }
     }
 
@@ -125,17 +78,30 @@ namespace TasksForJunior
             }
         }
 
-        public Card GiveCard()
+        internal Card GiveCard
         {
-            int randomCard = _random.Next(0, _cards.Count);
-            Card cardTemp = _cards[randomCard];
-            _cards.RemoveAt(randomCard);
-            return cardTemp;
+            get
+            {
+                if (_cards.Count > 0)
+                {
+                    int randomCard = _random.Next(0, _cards.Count);
+                    Card cardTemp = _cards[randomCard];
+                    _cards.RemoveAt(randomCard);
+                    return cardTemp;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
-        public void AcceptsCardsPlayer(Card card)
+        internal void ReturnCard(Card card)
         {
-            _cards.Add(card);
+            if (card == null)
+                Console.WriteLine("Игрок ничего не отдал. У него наверное нет карт.");
+            else
+                _cards.Add(card);
         }
 
         public void ShowDeck()
@@ -163,8 +129,6 @@ namespace TasksForJunior
     {
         private List<Card> _cards;
 
-        public int MaxCard { get; private set; } = 10;
-
         public string Name { get; private set; }
 
         public Player(string name)
@@ -173,25 +137,29 @@ namespace TasksForJunior
             _cards = new List<Card>();
         }
 
-        public void ChangeMaxNumberCard(int number)
+        public Card GivesCard
         {
-            MaxCard = number;
+            get
+            {
+                if (_cards.Count > 0)
+                {
+                    Card card = _cards[0];
+                    _cards.RemoveAt(0);
+                    return card;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
-        public void TakesCard(Deck deck)
+        public void TakesCard(Card card)
         {
-            if (_cards.Count < MaxCard && deck.CardsDeck > 0)
-            {
-                _cards.Add(deck.GiveCard());
-            }
-            else if (_cards.Count == MaxCard)
-            {
-                Console.WriteLine($"Вы больше не можете взять карту. У вас привышен лимит в {MaxCard} карт");
-            }
+            if (card == null)
+                Console.WriteLine("Крупье не дал карту. В колоде нет карт");
             else
-            {
-                Console.WriteLine("В колоде закончились карты");
-            }
+                _cards.Add(card);
         }
 
         public void ShowCard()
@@ -213,15 +181,71 @@ namespace TasksForJunior
                 Console.WriteLine("У игрока нет карт.");
             }
         }
+    }
 
-        public void GivesCardsDeck(Deck deck)
+    class Croupier
+    {
+        private Deck _deck;
+
+        public Card GiveCard
         {
-            foreach (var card in _cards)
+            get
             {
-                deck.AcceptsCardsPlayer(card);
+                if (_deck.CardsDeck > 0)
+                    return _deck.GiveCard;
+                else
+                    return null;
             }
+        }
 
-            _cards.Clear();
+        public Croupier() => _deck = new Deck();
+
+        public void TakeCard(Card card) => _deck.ReturnCard(card);
+
+        public void ShowDeck() => _deck.ShowDeck();
+    }
+
+    class Game
+    {
+        private const string CommandCardsDeckSee = "deck";
+        private const string CommandCardsPlayerSee = "player";
+        private const string CommandCardTake = "take";
+        private const string CommandCardGive = "give";
+
+        private Croupier _croupier;
+        private Player _player;
+
+        public string CardsDeckSee { get { return CommandCardsDeckSee; } }
+        public string CardsPlayerSee { get { return CommandCardsPlayerSee; } }
+        public string CardTake { get { return CommandCardTake; } }
+        public string CardGive { get { return CommandCardGive; } }
+
+        public Game(Croupier croupier, Player player)
+        {
+            _croupier = croupier;
+            _player = player;
+        }
+
+        public void GamesPlayer(string command)
+        {
+            switch (command)
+            {
+                case CommandCardGive:
+                    _croupier.TakeCard(_player.GivesCard);
+                    break;
+                case CommandCardsDeckSee:
+                    _croupier.ShowDeck();
+                    break;
+                case CommandCardsPlayerSee:
+                    _player.ShowCard();
+                    break;
+                case CommandCardTake:
+                    _player.TakesCard(_croupier.GiveCard);
+                    break;
+                default:
+                    Console.WriteLine("Вы не правильно ввели команду. Попробуйте еще раз.");
+                    break;
+            }
         }
     }
 }
