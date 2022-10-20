@@ -7,9 +7,6 @@ namespace TasksForJunior
     {
         static void Main()
         {
-            const string CommandExit = "exit";
-            bool isWorkProgram = true;
-
             Croupier croupier = new Croupier();
 
             Console.Write("Введите имя игрока: ");
@@ -20,25 +17,7 @@ namespace TasksForJunior
             Console.WriteLine();
 
             Game game = new Game(croupier, player);
-
-            Console.WriteLine($"Правила пользования программой:\n" +
-                $"Для просмотра колоды карт наберите команду: {game.CardsDeckSee}\n" +
-                $"Для просмотра карт которые есть у игрока наберите команду: {game.CardsPlayerSee}\n" +
-                $"Чтобы взять карту с колоды наберите команду {game.CardTake}\n" +
-                $"Чтобы вернуть карту игрока в колоду наберите команду {game.CardGive}\n" +
-                $"Для завершения работы программы наберите команду {CommandExit}");
-            Console.WriteLine();
-
-            while (isWorkProgram)
-            {
-                Console.Write("Введите команду: ");
-                string command = Console.ReadLine();
-
-                if (command == CommandExit)
-                    isWorkProgram = false;
-                else
-                    game.GamesPlayer(command);
-            }
+            game.Play();
         }
     }
 
@@ -57,46 +36,43 @@ namespace TasksForJunior
 
     class Deck
     {
-        private string[] _cardSuit = new string[] { "club", "diamond", "heart", "spade" };
-        private string[] _cardRank = new string[] { "6", "7", "8", "9", "10", "Ase", "Jack", "King", "Queen" };
         private List<Card> _cards;
         private Random _random = new Random();
 
-        public int CardsDeck { get { return _cards.Count; } }
+        public int CardsCount { get { return _cards.Count; } }
 
         public Deck()
         {
             _cards = new List<Card>();
+            string[] _cardsSuit = { "club", "diamond", "heart", "spade" };
+            string[] _cardsRank = { "6", "7", "8", "9", "10", "Ase", "Jack", "King", "Queen" };
 
-            for (int i = 0; i < _cardRank.Length; i++)
+            for (int i = 0; i < _cardsRank.Length; i++)
             {
-                for (int j = 0; j < _cardSuit.Length; j++)
+                for (int j = 0; j < _cardsSuit.Length; j++)
                 {
-                    Card card = new Card(_cardSuit[j], _cardRank[i]);
+                    Card card = new Card(_cardsSuit[j], _cardsRank[i]);
                     _cards.Add(card);
                 }
             }
         }
 
-        internal Card GiveCard
+        public Card GiveCard()
         {
-            get
+            if (_cards.Count > 0)
             {
-                if (_cards.Count > 0)
-                {
-                    int randomCard = _random.Next(0, _cards.Count);
-                    Card cardTemp = _cards[randomCard];
-                    _cards.RemoveAt(randomCard);
-                    return cardTemp;
-                }
-                else
-                {
-                    return null;
-                }
+                int randomCard = _random.Next(0, _cards.Count);
+                Card cardTemp = _cards[randomCard];
+                _cards.RemoveAt(randomCard);
+                return cardTemp;
+            }
+            else
+            {
+                return null;
             }
         }
 
-        internal void ReturnCard(Card card)
+        public void ReturnCard(Card card)
         {
             if (card == null)
                 Console.WriteLine("Игрок ничего не отдал. У него наверное нет карт.");
@@ -191,8 +167,8 @@ namespace TasksForJunior
         {
             get
             {
-                if (_deck.CardsDeck > 0)
-                    return _deck.GiveCard;
+                if (_deck.CardsCount > 0)
+                    return _deck.GiveCard();
                 else
                     return null;
             }
@@ -211,14 +187,10 @@ namespace TasksForJunior
         private const string CommandCardsPlayerSee = "player";
         private const string CommandCardTake = "take";
         private const string CommandCardGive = "give";
+        private const string CommandExit = "exit";
 
         private Croupier _croupier;
         private Player _player;
-
-        public string CardsDeckSee { get { return CommandCardsDeckSee; } }
-        public string CardsPlayerSee { get { return CommandCardsPlayerSee; } }
-        public string CardTake { get { return CommandCardTake; } }
-        public string CardGive { get { return CommandCardGive; } }
 
         public Game(Croupier croupier, Player player)
         {
@@ -226,25 +198,44 @@ namespace TasksForJunior
             _player = player;
         }
 
-        public void GamesPlayer(string command)
+        public void Play()
         {
-            switch (command)
+            bool isWorkProgram = true;
+
+            Console.WriteLine("Правила пользования программой:\n" +
+                              $"Для просмотра колоды карт наберите команду: {CommandCardsDeckSee}\n" +
+                              $"Для просмотра карт которые есть у игрока наберите команду: {CommandCardsPlayerSee}\n" +
+                              $"Чтобы взять карту с колоды наберите команду {CommandCardTake}\n" +
+                              $"Чтобы вернуть карту игрока в колоду наберите команду {CommandCardGive}\n" +
+                              $"Для завершения работы программы наберите команду {CommandExit}");
+            Console.WriteLine();
+
+            while (isWorkProgram)
             {
-                case CommandCardGive:
-                    _croupier.TakeCard(_player.GivesCard);
-                    break;
-                case CommandCardsDeckSee:
-                    _croupier.ShowDeck();
-                    break;
-                case CommandCardsPlayerSee:
-                    _player.ShowCard();
-                    break;
-                case CommandCardTake:
-                    _player.TakesCard(_croupier.GiveCard);
-                    break;
-                default:
-                    Console.WriteLine("Вы не правильно ввели команду. Попробуйте еще раз.");
-                    break;
+                Console.Write("Введите команду: ");
+                string command = Console.ReadLine();
+
+                switch (command)
+                {
+                    case CommandExit:
+                        isWorkProgram = false;
+                        break;
+                    case CommandCardGive:
+                        _croupier.TakeCard(_player.GivesCard);
+                        break;
+                    case CommandCardsDeckSee:
+                        _croupier.ShowDeck();
+                        break;
+                    case CommandCardsPlayerSee:
+                        _player.ShowCard();
+                        break;
+                    case CommandCardTake:
+                        _player.TakesCard(_croupier.GiveCard);
+                        break;
+                    default:
+                        Console.WriteLine("Вы не правильно ввели команду. Попробуйте еще раз.");
+                        break;
+                }
             }
         }
     }
