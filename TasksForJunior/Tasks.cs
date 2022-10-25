@@ -61,9 +61,19 @@ namespace TasksForJunior
     class Player
     {
         static private int _idNamber = 0;
-        public readonly int MaxLevel = 100;
-        public readonly int MinLevel = 1;
+        private int _maxLevel = 100;
+        private int _minLevel = 1;
         private int _level;
+
+        public Player(string name, int level = 1, bool isBan = false)
+        {
+            FullName = name;
+            Level = level;
+            IsBan = isBan;
+            _idNamber++;
+            IdNumber = _idNamber;
+        }
+
         public string FullName { get; private set; }
         public bool IsBan { get; private set; }
         public int IdNumber { get; private set; }
@@ -75,20 +85,11 @@ namespace TasksForJunior
             }
             private set
             {
-                if (value >= MinLevel && value <= MaxLevel)
+                if (value >= _minLevel && value <= _maxLevel)
                     _level = value;
                 else
-                    _level = MinLevel;
+                    _level = _minLevel;
             }
-        }
-
-        public Player(string name, int level = 1, bool isBan = false)
-        {
-            FullName = name;
-            Level = level;
-            IsBan = isBan;
-            _idNamber++;
-            IdNumber = _idNamber;
         }
 
         public void Ban()
@@ -123,9 +124,7 @@ namespace TasksForJunior
         {
             Console.Write("Введите ФИО игрока которого хотите добавить: ");
             string fullName = Console.ReadLine();
-
             Console.Write($"Введите начальный уровень игрока, если уровень игрока не будет введен, то ему присвоется 1 уровень : ");
-
             int.TryParse(Console.ReadLine(), out int level);
 
             Player player = new Player(fullName, level);
@@ -139,12 +138,11 @@ namespace TasksForJunior
         {
             Console.WriteLine("Введите индивидуальный номер игрока которого хотите забанить:");
 
-            if (TryGetPlayer(Console.ReadLine(), out Player player))
+            if (TryGetPlayer(out Player player))
             {
                 Console.WriteLine("Вы забанили игрока:");
-                player.Ban();
-                player.Show();
-                _playersBase.Add(player);
+                _playersBase[_playersBase.IndexOf(player)].Ban();
+                _playersBase[_playersBase.IndexOf(player)].Show();
             }
         }
 
@@ -152,12 +150,11 @@ namespace TasksForJunior
         {
             Console.WriteLine("Введите индивидуальный номер игрока которого хотите разбанить:");
 
-            if (TryGetPlayer(Console.ReadLine(), out Player player))
+            if (TryGetPlayer(out Player player))
             {
                 Console.WriteLine("Вы разбанили игрока:");
-                player.Unban();
-                player.Show();
-                _playersBase.Add(player);
+                _playersBase[_playersBase.IndexOf(player)].Unban();
+                _playersBase[_playersBase.IndexOf(player)].Show();
             }
         }
 
@@ -165,16 +162,37 @@ namespace TasksForJunior
         {
             Console.WriteLine("Введите индивидуальный номер игрока которого хотите удалить:");
 
-            if (TryGetPlayer(Console.ReadLine(), out Player player))
+            if (TryGetPlayer(out Player player))
             {
-                Console.WriteLine("Вы удалили игрока:");
-                player.Show();
+                _playersBase[_playersBase.IndexOf(player)].Show();
+                _playersBase.Remove(player);
             }
         }
 
-        private bool TryGetPlayer(string idNamber, out Player player)
+        public void Show()
+        {
+            int serialNumber = 1;
+
+            if (_playersBase.Count > 0)
+            {
+                foreach (var player in _playersBase)
+                {
+                    Console.WriteLine($"Порядковый номер: {serialNumber}");
+                    player.Show();
+                    serialNumber++;
+                }
+            }
+            else
+            {
+                Console.WriteLine("В базе нет игроков!");
+            }
+
+        }
+
+        private bool TryGetPlayer(out Player player)
         {
             player = null;
+            string idNamber = Console.ReadLine();
 
             if (int.TryParse(idNamber, out int result))
             {
@@ -198,29 +216,9 @@ namespace TasksForJunior
             }
             else
             {
-                _playersBase.Remove(player);
                 return true;
             }
         }
-
-        public void Show()
-        {
-            int serialNumber = 1;
-
-            if (_playersBase.Count > 0)
-            {
-                foreach (var player in _playersBase)
-                {
-                    Console.WriteLine($"Порядковый номер: {serialNumber}");
-                    player.Show();
-                    serialNumber++;
-                }
-            }
-            else
-            {
-                Console.WriteLine("В базе нет игроков!");
-            }
-
-        }
     }
 }
+
