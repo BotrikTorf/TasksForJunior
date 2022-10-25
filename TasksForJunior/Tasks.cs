@@ -39,8 +39,6 @@ namespace TasksForJunior
         private List<Card> _cards;
         private Random _random = new Random();
 
-        public int CardsCount { get { return _cards.Count; } }
-
         public Deck()
         {
             _cards = new List<Card>();
@@ -57,6 +55,8 @@ namespace TasksForJunior
             }
         }
 
+        public int CardsCount { get { return _cards.Count; } }
+
         public Card GiveCard()
         {
             if (_cards.Count > 0)
@@ -72,10 +72,10 @@ namespace TasksForJunior
             }
         }
 
-        public void ReturnCard(Card card)
+        public void TakesCards(Card card)
         {
             if (card == null)
-                Console.WriteLine("Игрок ничего не отдал. У него наверное нет карт.");
+                Console.WriteLine("Игрок ничего не отдал. У него нет карт.");
             else
                 _cards.Add(card);
         }
@@ -105,28 +105,25 @@ namespace TasksForJunior
     {
         private List<Card> _cards;
 
-        public string Name { get; private set; }
-
         public Player(string name)
         {
             Name = name;
             _cards = new List<Card>();
         }
 
-        public Card GivesCard
+        public string Name { get; private set; }
+
+        public Card GivesCard()
         {
-            get
+            if (_cards.Count > 0)
             {
-                if (_cards.Count > 0)
-                {
-                    Card card = _cards[0];
-                    _cards.RemoveAt(0);
-                    return card;
-                }
-                else
-                {
-                    return null;
-                }
+                Card card = _cards[0];
+                _cards.RemoveAt(0);
+                return card;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -162,21 +159,15 @@ namespace TasksForJunior
     class Croupier
     {
         private Deck _deck;
+        
+        public Croupier() => _deck = new Deck();
 
         public Card GiveCard
         {
-            get
-            {
-                if (_deck.CardsCount > 0)
-                    return _deck.GiveCard();
-                else
-                    return null;
-            }
+            get { return _deck.CardsCount > 0 ? _deck.GiveCard() : null; }
         }
 
-        public Croupier() => _deck = new Deck();
-
-        public void TakeCard(Card card) => _deck.ReturnCard(card);
+        public void TakeCard(Card card) => _deck.TakesCards(card);
 
         public void ShowDeck() => _deck.ShowDeck();
     }
@@ -221,7 +212,7 @@ namespace TasksForJunior
                         isWorkProgram = false;
                         break;
                     case CommandCardGive:
-                        _croupier.TakeCard(_player.GivesCard);
+                        _croupier.TakeCard(_player.GivesCard());
                         break;
                     case CommandCardsDeckSee:
                         _croupier.ShowDeck();
