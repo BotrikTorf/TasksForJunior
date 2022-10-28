@@ -7,75 +7,29 @@ namespace TasksForJunior
     {
         static void Main()
         {
-            const string CommandExit = "exit";
-            const string CommandLookBase = "look";
-            const string CommandBanPlayer = "ban";
-            const string CommandUnbanPlayer = "unban";
-            const string CommandDeletePlayer = "delete";
-            const string CommandAddPlayer = "add";
-            bool isWork = true;
-
             Database database = new Database();
-
-            Console.WriteLine("Добро пожаловать в базу данных игроков!");
-            Console.WriteLine($"Для работы с базой данных игроков используются команды:\n" +
-                              $"{CommandExit} - выходит из программы\n" +
-                              $"{CommandLookBase} - данная команда позваляет просмотреть всю базу данных по игрокам\n" +
-                              $"{CommandBanPlayer} - данная команда ставит бан по индивидуальному номеру игрока\n" +
-                              $"{CommandUnbanPlayer} - данная команда снимает бан по индивидуальному номеру игрока\n" +
-                              $"{CommandDeletePlayer} - команда удаляет игрока по индивидуальному номеру\n" +
-                              $"{CommandAddPlayer} - добовляет игрока в базу данных.");
-
-            while (isWork)
-            {
-                Console.WriteLine("Введите команду:");
-
-                switch (Console.ReadLine())
-                {
-                    case CommandExit:
-                        isWork = false;
-                        break;
-                    case CommandLookBase:
-                        database.Show();
-                        break;
-                    case CommandBanPlayer:
-                        database.BanPlayer();
-                        break;
-                    case CommandUnbanPlayer:
-                        database.UnbanPlayer();
-                        break;
-                    case CommandDeletePlayer:
-                        database.DeletesPlayer();
-                        break;
-                    case CommandAddPlayer:
-                        database.AddPlayer();
-                        break;
-                    default:
-                        Console.WriteLine("Вы не правельно ввели команду!");
-                        break;
-                }
-            }
+            database.Work();
         }
     }
 
     class Player
     {
-        static private int _idNamber = 0;
+        static private int _idLastNumber = 0;
         private int _maxLevel = 100;
         private int _minLevel = 1;
         private int _level;
 
-        public Player(string name, int level = 1, bool isBan = false)
+        public Player(string name, int level = 1)
         {
             FullName = name;
             Level = level;
-            IsBan = isBan;
-            _idNamber++;
-            IdNumber = _idNamber;
+            IsBaned = false;
+            _idLastNumber++;
+            IdNumber = _idLastNumber;
         }
 
         public string FullName { get; private set; }
-        public bool IsBan { get; private set; }
+        public bool IsBaned { get; private set; }
         public int IdNumber { get; private set; }
         public int Level
         {
@@ -94,12 +48,12 @@ namespace TasksForJunior
 
         public void Ban()
         {
-            IsBan = true;
+            IsBaned = true;
         }
 
         public void Unban()
         {
-            IsBan = false;
+            IsBaned = false;
         }
 
         public void Show()
@@ -107,7 +61,7 @@ namespace TasksForJunior
             Console.WriteLine($"Индивидуальный номер: {IdNumber}\n" +
                               $"ФИО игрока: {FullName}\n" +
                               $"Уровень игрока: {_level}\n" +
-                              $"Игрок забанен: {IsBan}\n");
+                              $"Игрок забанен: {IsBaned}\n");
         }
     }
 
@@ -120,7 +74,57 @@ namespace TasksForJunior
             _playersBase = new List<Player>();
         }
 
-        public void AddPlayer()
+        public void Work()
+        {
+            const string CommandExit = "exit";
+            const string CommandLookBase = "look";
+            const string CommandBanPlayer = "ban";
+            const string CommandUnbanPlayer = "unban";
+            const string CommandDeletePlayer = "delete";
+            const string CommandAddPlayer = "add";
+            bool isWork = true;
+
+            Console.WriteLine("Добро пожаловать в базу данных игроков!");
+            Console.WriteLine($"Для работы с базой данных игроков используются команды:\n" +
+                              $"{CommandExit} - выходит из программы\n" +
+                              $"{CommandLookBase} - посмотреть всех игроков\n" +
+                              $"{CommandBanPlayer} - поставить бан игроку\n" +
+                              $"{CommandUnbanPlayer} - снять бан у игрока\n" +
+                              $"{CommandDeletePlayer} - удалить игрока\n" +
+                              $"{CommandAddPlayer} - добовить игрока в базу данных.");
+
+            while (isWork)
+            {
+                Console.WriteLine("Введите команду:");
+
+                switch (Console.ReadLine())
+                {
+                    case CommandExit:
+                        isWork = false;
+                        break;
+                    case CommandLookBase:
+                        Show();
+                        break;
+                    case CommandBanPlayer:
+                        BanPlayer();
+                        break;
+                    case CommandUnbanPlayer:
+                        UnbanPlayer();
+                        break;
+                    case CommandDeletePlayer:
+                        DeletesPlayer();
+                        break;
+                    case CommandAddPlayer:
+                        AddPlayer();
+                        break;
+                    default:
+                        Console.WriteLine("Вы не правельно ввели команду!");
+                        break;
+                }
+            }
+        }
+
+        private void AddPlayer()
         {
             Console.Write("Введите ФИО игрока которого хотите добавить: ");
             string fullName = Console.ReadLine();
@@ -134,59 +138,55 @@ namespace TasksForJunior
             _playersBase.Add(player);
         }
 
-        public void BanPlayer()
+        private void BanPlayer()
         {
-            Console.WriteLine("Введите индивидуальный номер игрока которого хотите забанить:");
+            Console.Write("Введите индивидуальный номер игрока которого хотите забанить: ");
 
             if (TryGetPlayer(out Player player))
             {
                 Console.WriteLine("Вы забанили игрока:");
-                _playersBase[_playersBase.IndexOf(player)].Ban();
-                _playersBase[_playersBase.IndexOf(player)].Show();
+                player.Ban();
+                player.Show();
             }
         }
 
-        public void UnbanPlayer()
+        private void UnbanPlayer()
         {
-            Console.WriteLine("Введите индивидуальный номер игрока которого хотите разбанить:");
+            Console.Write("Введите индивидуальный номер игрока которого хотите разбанить: ");
 
             if (TryGetPlayer(out Player player))
             {
                 Console.WriteLine("Вы разбанили игрока:");
-                _playersBase[_playersBase.IndexOf(player)].Unban();
-                _playersBase[_playersBase.IndexOf(player)].Show();
+                player.Unban();
+                player.Show();
             }
         }
 
-        public void DeletesPlayer()
+        private void DeletesPlayer()
         {
-            Console.WriteLine("Введите индивидуальный номер игрока которого хотите удалить:");
+            Console.Write("Введите индивидуальный номер игрока которого хотите удалить: ");
 
             if (TryGetPlayer(out Player player))
             {
-                _playersBase[_playersBase.IndexOf(player)].Show();
+                player.Show();
                 _playersBase.Remove(player);
             }
         }
 
-        public void Show()
+        private void Show()
         {
-            int serialNumber = 1;
-
             if (_playersBase.Count > 0)
             {
-                foreach (var player in _playersBase)
+                for (int i = 0; i < _playersBase.Count; i++)
                 {
-                    Console.WriteLine($"Порядковый номер: {serialNumber}");
-                    player.Show();
-                    serialNumber++;
+                    Console.WriteLine($"Порядковый номер: {i + 1}");
+                    _playersBase[i].Show();
                 }
             }
             else
             {
                 Console.WriteLine("В базе нет игроков!");
             }
-
         }
 
         private bool TryGetPlayer(out Player player)
