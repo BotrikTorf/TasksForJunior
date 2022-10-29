@@ -42,15 +42,14 @@ namespace TasksForJunior
         public Deck()
         {
             _cards = new List<Card>();
-            string[] _cardsSuit = { "club", "diamond", "heart", "spade" };
-            string[] _cardsRank = { "6", "7", "8", "9", "10", "Ase", "Jack", "King", "Queen" };
+            string[] suit = { "club", "diamond", "heart", "spade" };
+            string[] rank = { "6", "7", "8", "9", "10", "Ase", "Jack", "King", "Queen" };
 
-            for (int i = 0; i < _cardsRank.Length; i++)
+            for (int i = 0; i < rank.Length; i++)
             {
-                for (int j = 0; j < _cardsSuit.Length; j++)
+                for (int j = 0; j < suit.Length; j++)
                 {
-                    Card card = new Card(_cardsSuit[j], _cardsRank[i]);
-                    _cards.Add(card);
+                    _cards.Add(new Card(suit[j], rank[i]));
                 }
             }
         }
@@ -72,7 +71,7 @@ namespace TasksForJunior
             }
         }
 
-        public void TakesCards(Card card)
+        public void TakeCard(Card card)
         {
             if (card == null)
                 Console.WriteLine("Игрок ничего не отдал. У него нет карт.");
@@ -80,7 +79,7 @@ namespace TasksForJunior
                 _cards.Add(card);
         }
 
-        public void ShowDeck()
+        public void Show()
         {
             if (_cards.Count > 0)
             {
@@ -113,7 +112,7 @@ namespace TasksForJunior
 
         public string Name { get; private set; }
 
-        public Card GivesCard()
+        public Card GiveCard()
         {
             if (_cards.Count > 0)
             {
@@ -127,7 +126,7 @@ namespace TasksForJunior
             }
         }
 
-        public void TakesCard(Card card)
+        public void TakeCard(Card card)
         {
             if (card == null)
                 Console.WriteLine("Крупье не дал карту. В колоде нет карт");
@@ -135,7 +134,7 @@ namespace TasksForJunior
                 _cards.Add(card);
         }
 
-        public void ShowCard()
+        public void ShowCards()
         {
             if (_cards.Count > 0)
             {
@@ -167,9 +166,9 @@ namespace TasksForJunior
             get { return _deck.CardsCount > 0 ? _deck.GiveCard() : null; }
         }
 
-        public void TakeCard(Card card) => _deck.TakesCards(card);
+        public void TakeCard(Card card) => _deck.TakeCard(card);
 
-        public void ShowDeck() => _deck.ShowDeck();
+        public void ShowDeck() => _deck.Show();
     }
 
     class Game
@@ -212,16 +211,16 @@ namespace TasksForJunior
                         isWorkProgram = false;
                         break;
                     case CommandCardGive:
-                        _croupier.TakeCard(_player.GivesCard());
+                        _croupier.TakeCard(_player.GiveCard());
                         break;
                     case CommandCardsDeckSee:
                         _croupier.ShowDeck();
                         break;
                     case CommandCardsPlayerSee:
-                        _player.ShowCard();
+                        _player.ShowCards();
                         break;
                     case CommandCardTake:
-                        _player.TakesCard(_croupier.GiveCard);
+                        _player.TakeCard(_croupier.GiveCard);
                         break;
                     default:
                         Console.WriteLine("Вы не правильно ввели команду. Попробуйте еще раз.");
