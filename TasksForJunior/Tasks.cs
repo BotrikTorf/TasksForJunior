@@ -18,19 +18,16 @@ namespace TasksForJunior
         }
     }
 
-    class Subject
+    abstract class Subject
     {
-        private int _price;
-        private string _title;
+        private readonly int _price;
+        private readonly string _title;
 
         public Subject(int price, string title)
         {
             _price = price;
             _title = title;
         }
-
-        public int Price { get { return _price; } private set { } }
-        public string Title { get { return _title; } private set { } }
 
         public void Show()
         {
@@ -41,14 +38,12 @@ namespace TasksForJunior
 
     class FoodManna : Subject
     {
-        int _amountManna;
+        private readonly int _amountManna;
 
         public FoodManna(int amountManna, int price, string title) : base(price, title)
         {
             _amountManna = amountManna;
         }
-
-        public int AmountManna { get { return _amountManna; } private set { } }
 
         public new void Show()
         {
@@ -59,14 +54,12 @@ namespace TasksForJunior
 
     class FoodHP : Subject
     {
-        int _amountHP;
+        private readonly int _amountHP;
 
         public FoodHP(int amountHP, int price, string title) : base(price, title)
         {
             _amountHP = amountHP;
         }
-
-        public int AmountHP { get { return _amountHP; } private set { } }
 
         public new void Show()
         {
@@ -77,8 +70,8 @@ namespace TasksForJunior
 
     class Weapon : Subject
     {
-        private int _maxDamage;
-        private int _minDamage;
+        private readonly int _maxDamage;
+        private readonly int _minDamage;
 
         public Weapon(int maxDamage, int minDamage, int price, string title) : base(price, title)
         {
@@ -95,9 +88,9 @@ namespace TasksForJunior
 
     class Player
     {
-        private List<Weapon> _weapons;
-        private List<FoodManna> _foodsManna;
-        private List<FoodHP> _foodsHP;
+        private readonly List<Weapon> _weapons;
+        private readonly List<FoodManna> _foodsManna;
+        private readonly List<FoodHP> _foodsHP;
 
         public Player()
         {
@@ -106,19 +99,20 @@ namespace TasksForJunior
             _foodsManna = new List<FoodManna>(50);
         }
 
-        public void PurchaseWeapons(Weapon weapon)
+        public void Purchase(Subject subject)
         {
-            _weapons.Add(weapon);
-        }
-
-        public void PurchaseFoodManna(FoodManna foodManna)
-        {
-            _foodsManna.Add(foodManna);
-        }
-
-        public void PurchaseFoodHP(FoodHP foodHp)
-        {
-            _foodsHP.Add(foodHp);
+            if (subject is Weapon weapon)
+            {
+                _weapons.Add(weapon);
+            }
+            else if (subject is FoodHP foodHP)
+            {
+                _foodsHP.Add(foodHP);
+            }
+            else if (subject is FoodManna foodManna)
+            {
+                _foodsManna.Add(foodManna);
+            }
         }
 
         public void Show()
@@ -152,42 +146,26 @@ namespace TasksForJunior
         private const int PriceOneWeapon = 10;
         private const int PriceTwoWeapon = 20;
         private const int PriceFood = 3;
+        private const int OneHandedWeaponDamageRatio = 1;
+        private const int TowHandedWeaponDamageRatio = 10;
 
-        private string[] oneHandedWeapon = { "OneHandedSword", "OneHandedAxe", "OneHandedHammer" };
-        private string[] twoHandedWeapon = { "TwoHandedSword", "TwoHandedAxe", "TwoHandedHammer" };
-        private string[] foodsNameHP = { "Apple", "Pear", "Bread" };
-        private string[] foodsNameManna = { "Water", "Milk", "Tea" };
 
-        private List<Weapon> _weapons;
-        private List<FoodManna> _foodsManna;
-        private List<FoodHP> _foodsHP;
-        private Random _random = new Random();
+        private readonly string[] oneHandedWeapon = { "OneHandedSword", "OneHandedAxe", "OneHandedHammer" };
+        private readonly string[] twoHandedWeapon = { "TwoHandedSword", "TwoHandedAxe", "TwoHandedHammer" };
+        private readonly string[] foodsNameHP = { "Apple", "Pear", "Bread" };
+        private readonly string[] foodsNameManna = { "Water", "Milk", "Tea" };
+
+        private readonly List<Weapon> _weapons;
+        private readonly List<FoodManna> _foodsManna;
+        private readonly List<FoodHP> _foodsHP;
+        private readonly Random _random = new Random();
 
         public Salesman()
         {
             _weapons = new List<Weapon>();
 
-            for (int i = 0; i < oneHandedWeapon.Length; i++)
-            {
-                int lowerMinDamage = 1;
-                int upperMinDamage = 3;
-                int lowerMaxDamage = 4;
-                int upperMaxDamage = 6;
-                int minDamage = _random.Next(lowerMinDamage, upperMinDamage);
-                int maxDamage = _random.Next(lowerMaxDamage, upperMaxDamage);
-                _weapons.Add(new Weapon(maxDamage, minDamage, PriceOneWeapon, oneHandedWeapon[i]));
-            }
-
-            for (int i = 0; i < twoHandedWeapon.Length; i++)
-            {
-                int lowerMinDamage = 10;
-                int upperMinDamage = 13;
-                int lowerMaxDamage = 14;
-                int upperMaxDamage = 16;
-                int minDamage = _random.Next(lowerMinDamage, upperMinDamage);
-                int maxDamage = _random.Next(lowerMaxDamage, upperMaxDamage);
-                _weapons.Add(new Weapon(maxDamage, minDamage, PriceTwoWeapon, twoHandedWeapon[i]));
-            }
+            CreatesWeapon(oneHandedWeapon, PriceOneWeapon, OneHandedWeaponDamageRatio);
+            CreatesWeapon(twoHandedWeapon, PriceTwoWeapon, TowHandedWeaponDamageRatio);
 
             _foodsHP = new List<FoodHP>();
 
@@ -219,19 +197,20 @@ namespace TasksForJunior
             return _foodsManna;
         }
 
-        public void SaleWeapon(int number)
+        public void Sale(Subject subject)
         {
-            _weapons.RemoveAt(number);
-        }
-
-        public void SaleFoodHP(int number)
-        {
-            _foodsHP.RemoveAt(number);
-        }
-
-        public void SaleFoodManna(int number)
-        {
-            _foodsManna.RemoveAt(number);
+            if (subject is Weapon weapon)
+            {
+                _weapons.Remove(weapon);
+            }
+            else if (subject is FoodHP foodHP)
+            {
+                _foodsHP.Remove(foodHP);
+            }
+            else if (subject is FoodManna foodManna)
+            {
+                _foodsManna.Remove(foodManna);
+            }
         }
 
         public void Show()
@@ -258,17 +237,31 @@ namespace TasksForJunior
                 food.Show();
             }
         }
+
+        private void CreatesWeapon(string[] name, int PriceOneWeapon, int damage)
+        {
+            for (int i = 0; i < name.Length; i++)
+            {
+                int lowerMinDamage = 1 * damage;
+                int upperMinDamage = 3 * damage;
+                int lowerMaxDamage = 4 * damage;
+                int upperMaxDamage = 6 * damage;
+                int minDamage = _random.Next(lowerMinDamage, upperMinDamage);
+                int maxDamage = _random.Next(lowerMaxDamage, upperMaxDamage);
+                _weapons.Add(new Weapon(maxDamage, minDamage, PriceOneWeapon, name[i]));
+            }
+        }
     }
 
     class Bargaining
     {
-        private const string CommandWeapon = "weapons";
+        private const string CommandWeapon = "weapon";
         private const string CommandFoodManna = "manna";
         private const string CommandFoodHP = "hp";
         private const string CommandExit = "exit";
 
-        private Player _player;
-        private Salesman _salesman;
+        private readonly Player _player;
+        private readonly Salesman _salesman;
 
         private bool isTrading = true;
 
@@ -288,7 +281,7 @@ namespace TasksForJunior
 
             while (isTrading)
             {
-                Console.Write("Введите команду: ");
+                Console.Write("Введите команду для просмотра и покупки нужного вам товара: ");
 
                 switch (Console.ReadLine())
                 {
@@ -311,122 +304,52 @@ namespace TasksForJunior
             }
         }
 
-        private void TradinHP(List<FoodHP> foodsHP)
+        private void TradinHP(List<FoodHP> foodsHp)
         {
-            bool isWork = true;
-            int serialNumber = 0;
+            List<Subject> subject = foodsHp.Cast<Subject>().ToList();
 
-            Console.WriteLine("Представляю вам список товара: ");
-
-            foreach (var product in foodsHP)
-            {
-                Console.WriteLine($"Порядковый номер: {serialNumber}");
-                product.Show();
-                serialNumber++;
-            }
-
-            Console.WriteLine("Для покупки товара введите порядковый номер!\n" +
-                              "Для выхода из этого меню введите любую букву.");
-
-            while (isWork)
-            {
-                Console.Write($"Порядковый номер: ");
-
-                if (int.TryParse(Console.ReadLine(), out int number))
-                {
-                    if (number < foodsHP.Count)
-                    {
-                        _player.PurchaseFoodHP(foodsHP[number]);
-                        _salesman.SaleFoodHP(number);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Товара с таким номером нет.");
-                    }
-                }
-                else
-                {
-                    isWork = false;
-                }
-            }
+            Tradin(subject);
         }
 
         private void TradinManna(List<FoodManna> foodsManna)
         {
-            bool isWork = true;
-            int serialNumber = 0;
+            List<Subject> subject = foodsManna.Cast<Subject>().ToList();
 
-            Console.WriteLine("Представляю вам список товара: ");
-
-            foreach (var product in foodsManna)
-            {
-                Console.WriteLine($"Порядковый номер: {serialNumber}");
-                product.Show();
-                serialNumber++;
-            }
-
-            Console.WriteLine("Для покупки товара введите порядковый номер!\n" +
-                              "Для выхода из этого меню введите любую букву.");
-
-            while (isWork)
-            {
-                Console.Write($"Порядковый номер: ");
-
-                if (int.TryParse(Console.ReadLine(), out int number))
-                {
-                    if (number < foodsManna.Count)
-                    {
-                        _player.PurchaseFoodManna(foodsManna[number]);
-                        _salesman.SaleFoodManna(number);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Товара с таким номером нет.");
-                    }
-                }
-                else
-                {
-                    isWork = false;
-                }
-            }
+            Tradin(subject);
         }
 
         private void TradinWeapon(List<Weapon> weapons)
         {
-            bool isWork = true;
+            List<Subject> subject = weapons.Cast<Subject>().ToList();
+
+            Tradin(subject);
+        }
+
+        private void Tradin(List<Subject> subjects)
+        {
             int serialNumber = 0;
 
             Console.WriteLine("Представляю вам список товара: ");
 
-            foreach (var product in weapons)
+            foreach (var product in subjects)
             {
                 Console.WriteLine($"Порядковый номер: {serialNumber}");
                 product.Show();
                 serialNumber++;
             }
 
-            Console.WriteLine("Для покупки товара введите порядковый номер!\n" +
-                              "Для выхода из этого меню введите любую букву.");
+            Console.Write("Для покупки товара введите порядковый номер: ");
 
-            while (isWork)
+            if (int.TryParse(Console.ReadLine(), out int number))
             {
-                Console.Write($"Порядковый номер: ");
-
-                if (int.TryParse(Console.ReadLine(), out int number))
+                if (number < subjects.Count)
                 {
-                    if (number < weapons.Count)
-                    {
-                        _player.PurchaseWeapons(weapons[number]);
-                        _salesman.SaleWeapon(number);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Товара с таким номером нет.");
-                    }
+                    _player.Purchase(subjects[number]);
+                    _salesman.Sale(subjects[number]);
                 }
                 else
                 {
-                    isWork = false;
+                    Console.WriteLine("Товара с таким номером нет.");
                 }
             }
         }
