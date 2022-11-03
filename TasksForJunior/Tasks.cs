@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using TasksForJunior;
 
 namespace TasksForJunior
 {
@@ -16,30 +17,28 @@ namespace TasksForJunior
 
     enum City
     {
-        Минск,
-        Брест,
-        Витебск,
-        Гомель,
-        Гродно,
-        Могилев,
-        Барановичи,
-        Орша,
-        Полоцк,
-        Осиповичи,
-        Калинковичи
+        Minsk,
+        Brest,
+        Vitebsk,
+        Gomel,
+        Grodno,
+        Mogilev,
+        Baranovichi,
+        Orsha,
+        Polotsk,
+        Osipovichi,
+        Kalinkovichi
     }
 
     enum WagonCapacity
     {
-        Малый = 40,
-        Средний = 50,
-        Большой = 60
+        Small,
+        Average,
+        Big
     }
 
     class Direction
     {
-        private string _stationStart = null;
-        private string _stationEnd = null;
         private readonly List<String> _stations;
 
         public Direction()
@@ -50,8 +49,8 @@ namespace TasksForJunior
                 _stations.Add(city.ToString());
         }
 
-        public string StationStart { get { return _stationStart; } private set { } }
-        public string StationEnd { get { return _stationEnd; } private set { } }
+        public string StationStart { get; private set; } = null;
+        public string StationEnd { get; private set; } = null;
 
         public void Show()
         {
@@ -64,12 +63,16 @@ namespace TasksForJunior
             }
         }
 
-        public bool SetStartStation(int number)
+        public bool SetStation(int number)
         {
-            if (number < _stations.Count)
+            if (StationStart == null && number < _stations.Count)
             {
-                _stationStart = _stations[number];
-                _stations.RemoveAt(number);
+                StationStart = Station(number);
+                return false;
+            }
+            else if (number < _stations.Count)
+            {
+                StationEnd = Station(number);
                 return false;
             }
             else
@@ -79,93 +82,59 @@ namespace TasksForJunior
             }
         }
 
-        public bool SetEndStation(int number)
+        private string Station(int number)
         {
-            if (number < _stations.Count)
-            {
-                _stationEnd = _stations[number];
-                _stations.RemoveAt(number);
-                return false;
-            }
-            else
-            {
-                Console.WriteLine("Такой станции нет.");
-                return true;
-            }
+            string tempStetion = _stations[number];
+            _stations.RemoveAt(number);
+            return tempStetion;
         }
     }
 
-    class Ticket
+    class Wagon
     {
-        private const int MinNamberTickets = 0;
-        private const int MaxNamberTickets = 1000;
-        private readonly Random _random = new Random();
+        private int _minsize = 40;
+        public Wagon(string size = null)
+        {
+            foreach (var wagon in Enum.GetValues(typeof(WagonCapacity)))
+            {
+                if (size == wagon.ToString())
+                    Size = _minsize + (int)wagon * 10;
+            }
+        }
 
-        public int SoldTickets() => _random.Next(MinNamberTickets, MaxNamberTickets);
+        public int Size { get; } = 0;
     }
 
     class Train
     {
-        private readonly Dictionary<int, string> _wagons = new Dictionary<int, string>();
-
-        public Train()
+        public Train(string route = null, int capacity = 0, int numberPassengers = 0, int item = 0)
         {
-            foreach (var wagon in Enum.GetValues(typeof(WagonCapacity)))
-            {
-                _wagons.Add((int)wagon, wagon.ToString());
-            }
+            Route = route;
+            Capacity = capacity;
+            NumberPassengers = numberPassengers;
+            Item = item;
         }
 
-        public int TrainComposition { get; private set; }
-        public int WagonsUsedTrain { get; private set; }
-        public string NameTrainComposition { get; private set; }
+        public string Route { get; }
+        public int Capacity { get; }
+        public int NumberPassengers { get; }
+        public int Item { get; }
 
         public void Show()
         {
-            Console.WriteLine("У вас есть в наличии вагоны:");
-
-            foreach (var wagon in _wagons)
-            {
-                Console.WriteLine($"{wagon.Key} вместимостью {wagon.Value} человек");
-            }
-        }
-
-        public void CreationTrainComposition(int tickeds)
-        {
-            bool isCreation = true;
-
-            while (isCreation)
-            {
-                Console.Write("Ведите вместимость вагона из которых вы будете формировать состав:");
-
-                if (int.TryParse(Console.ReadLine(), out int result))
-                {
-                    if (_wagons.ContainsKey(result))
-                    {
-                        isCreation = false;
-                        TrainComposition = (int)Math.Truncate((double)tickeds / result) + 1;
-                        WagonsUsedTrain = result;
-                        NameTrainComposition = _wagons[result];
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Вагона с {result} посадочными местами нет! Повторите попытку.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Вы не ввели число.");
-                }
-            }
+            Console.WriteLine($"{Item} - номер поезда\n" +
+                              $"{Route} - маршрут поезда\n" +
+                              $"{Capacity} - вместимость поезда\n" +
+                              $"{NumberPassengers} - в поезд село посажиров");
         }
     }
 
     class Terminal
     {
-        private int _tickeds;
-        private readonly Ticket _ticket = new Ticket();
         private Direction _direction;
-        private Train _train;
+        private List<Train> _trains = new List<Train>();
+        private Wagon _wagon;
+        private Random _random = new Random();
 
         public void WorkStart()
         {
@@ -175,27 +144,100 @@ namespace TasksForJunior
 
             while (isWork)
             {
+                if (_trains.Count < 1)
+                    Console.WriteLine("Вы не отправили ни одного поезда");
+                else
+                    ShowTrain();
+
+                int minNamberTicket = 0;
+                int maxNamberTicket = 1000;
+                int ticketsSales = _random.Next(minNamberTicket, maxNamberTicket);
+
                 _direction = new Direction();
 
                 SetStartingStation(_direction);
                 SetEndStation(_direction);
                 Console.WriteLine($"Вы выбрали направление {_direction.StationStart} - {_direction.StationEnd}");
-                _tickeds = _ticket.SoldTickets();
-                Console.WriteLine($"Вы продали {_tickeds}");
-
-                _train = new Train();
-
-                _train.Show();
-                _train.CreationTrainComposition(_tickeds);
-                Console.WriteLine($"Для посадки {_tickeds} пасажиров сформирован состав из {_train.TrainComposition} {_train.NameTrainComposition} вагонов. " +
-                                  $"В каждом вагоне {_train.WagonsUsedTrain} посадочных мест.\n");
+                Console.WriteLine($"Вы продали {ticketsSales}");
+                ChoiceWagons();
+                SendTrain(ticketsSales);
                 isWork = Work();
+            }
+        }
+
+        private void SendTrain(int ticketsSales)
+        {
+            int numberWagons = MinWagonCount(ticketsSales);
+
+            Console.WriteLine("К отправке готов поезд:\n" +
+                              $"Номер поезда {_trains.Count}\n" +
+                              $"Следующий по маршруту {_direction.StationStart} - {_direction.StationEnd}\n" +
+                              $"Вместимость поезда {numberWagons * _wagon.Size}\n" +
+                              $"В поезд сядет {ticketsSales} пасажиров.\n");
+            Console.Write("Если все данные верны введите yes: ");
+
+            if (Console.ReadLine() == "yes")
+            {
+                Train train = new Train(_direction.StationStart + " - " + _direction.StationEnd, numberWagons * _wagon.Size,
+                    ticketsSales, _trains.Count);
+                _trains.Add(train);
+            }
+            else
+            {
+                Console.WriteLine("Отмена вышесозданного поезда.");
+            }
+        }
+
+        private int MinWagonCount(int ticketsSales)
+        {
+            return (int)Math.Truncate((double)ticketsSales / _wagon.Size) + 1;
+        }
+
+        private void ChoiceWagons()
+        {
+            Console.WriteLine("У вас есть в наличии вагоны:");
+
+            foreach (var wagon in Enum.GetValues(typeof(WagonCapacity)))
+            {
+                Console.WriteLine(wagon.ToString());
+            }
+
+            Console.WriteLine("Какой тип вагонов вы хотите выбрать? Ведите название:");
+
+            bool isChoice = false;
+
+            while (!isChoice)
+            {
+                _wagon = new Wagon(Console.ReadLine());
+
+                if (_wagon.Size != 0)
+                    isChoice = true;
+            }
+        }
+
+        private void ShowTrain()
+        {
+            foreach (var train in _trains)
+            {
+                Console.WriteLine("Вы отправили:");
+                train.Show();
             }
         }
 
         private void SetStartingStation(Direction direction)
         {
             Console.WriteLine("Выберете город из списка с которого начинается маршрут:");
+            SetStation(direction);
+        }
+
+        private void SetEndStation(Direction direction)
+        {
+            Console.WriteLine("Выберете город из списка на котором заканчиватся маршрут:");
+            SetStation(direction);
+        }
+
+        private void SetStation(Direction direction)
+        {
             direction.Show();
 
             bool isEnteredStantionStart = true;
@@ -203,23 +245,7 @@ namespace TasksForJunior
             while (isEnteredStantionStart)
             {
                 if (int.TryParse(Console.ReadLine(), out int number))
-                    isEnteredStantionStart = direction.SetStartStation(number);
-                else
-                    Console.WriteLine("Вы не ввели номер станции. Попробуйте еще раз.");
-            }
-        }
-
-        private void SetEndStation(Direction direction)
-        {
-            bool isEnteredStantionEnd = true;
-
-            Console.WriteLine("Выберете город из списка на котором заканчиватся маршрут:");
-            direction.Show();
-
-            while (isEnteredStantionEnd)
-            {
-                if (int.TryParse(Console.ReadLine(), out int number))
-                    isEnteredStantionEnd = direction.SetEndStation(number);
+                    isEnteredStantionStart = direction.SetStation(number);
                 else
                     Console.WriteLine("Вы не ввели номер станции. Попробуйте еще раз.");
             }
