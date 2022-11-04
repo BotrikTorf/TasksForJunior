@@ -28,17 +28,15 @@ namespace TasksForJunior
 
     abstract class Peolple
     {
-        private int _money;
+        protected Peolple(int money) => Money = money;
 
-        public Peolple(int money) => _money = money;
-
-        protected int Money { get { return _money; } private set { } }
+        public int Money { get; private set; } = 0;
 
         protected int GiveMoney(int requestedAmount)
         {
-            if (requestedAmount < _money)
+            if (requestedAmount < Money)
             {
-                _money -= requestedAmount;
+                Money -= requestedAmount;
                 return requestedAmount;
             }
             else
@@ -47,54 +45,70 @@ namespace TasksForJunior
             }
         }
 
-        protected void TakeMoney(int money) => _money += money;
+        protected void TakeMoney(int money) => Money += money;
     }
 
     class Player : Peolple
     {
-        private List<Product> _products;
+        private List<Cell> _cells;
 
-        public Player(int money = 0) : base(money) => _products = new List<Product>();
+        public Player(int money = 0) : base(money) => _cells = new List<Cell>();
 
-        public int Money { get { return base.Money; } private set { } }
+        public int Money => base.Money;
 
-        public void TakeProduct(Product product) => _products.Add(product);
+        public void TakeProduct(Cell product)
+        {
+            bool haveProduct = false;
+
+            foreach (var cell in _cells)
+            {
+                if (cell.Name == product.Name)
+                {
+                    haveProduct = true;
+                    cell.TakeProduct();
+                }
+            }
+
+            if (!haveProduct)
+            {
+                _cells.Add(product);
+            }
+        }
 
         public new void TakeMoney(int money) => base.TakeMoney(money);
 
         public new int GiveMoney(int requestedAmount) => base.GiveMoney(requestedAmount);
-        
-        public Product GiveProduct(string name)
+
+        public Cell GiveProduct(string name)
         {
-            Product temProduct = new Product();
+            Cell tempProduct = null;
 
-            bool haveProduct = false;
-
-            foreach (var product in _products)
+            foreach (var product in _cells)
             {
                 if (product.Name == name)
                 {
-                    temProduct = product;
-                    haveProduct = true;
+                    if (product.Amount>1)
+                    {
+                        product.SetProduct();
+                        tempProduct = new Cell(product.Name, product.Cost, 1);
+                    }
+                    else
+                    {
+                        tempProduct = new Cell(product.Name, product.Cost, 1);
+                        _cells.Remove(product);
+                    }
+
                     break;
                 }
             }
 
-            if (haveProduct)
-            {
-                _products.Remove(temProduct);
-                return temProduct;
-            }
-            else
-            {
-                return null;
-            }
+            return tempProduct;
         }
         public void ShowThings()
         {
-            if (_products.Count > 0)
-                foreach (var product in _products)
-                    Console.WriteLine($"Наименование товара: {product.Name}, цена товара: {product.Cost}");
+            if (_cells.Count > 0)
+                foreach (var product in _cells)
+                    Console.WriteLine($"Наименование товара: {product.Name}, цена товара: {product.Cost}, количество {product.Amount}");
             else
                 Console.WriteLine("Вещей нет.");
         }
@@ -102,13 +116,84 @@ namespace TasksForJunior
 
     class Seller : Peolple
     {
-        public Seller(int money = 0) : base(money) { }
+        private List<Cell> _cells;
+        private Random _random = new Random();
+        private int _minNumberProduct = 2;
+        private int _maxNumberProduct = 6;
 
-        public int Money { get { return base.Money; } private set { } }
+        public Seller(int money = 0) : base(money)
+        {
+            _cells = new List<Cell>();
+
+            foreach (var product in Enum.GetValues(typeof(ProductNamePrice)))
+            {
+                _cells.Add(new Cell(product.ToString(), (int)product, _random.Next(_minNumberProduct, _maxNumberProduct)));
+            }
+        }
+
+        public int Money => base.Money;
 
         public new void TakeMoney(int money) => base.TakeMoney(money);
 
         public new int GiveMoney(int requestedAmount) => base.GiveMoney(requestedAmount);
+
+        public Cell GiveProduct(string name)
+        {
+            Cell tempCell = null;
+
+            foreach (var cell in _cells)
+            {
+                if (cell.Name == name)
+                {
+                    tempCell = cell;
+                    break;
+                }
+            }
+
+            if (tempCell != null)
+            {
+                if (tempCell.Amount>0)
+                {
+                    tempCell.SetProduct();
+                    tempCell = new Cell(tempCell.Name, tempCell.Cost, 1);
+                }
+                else
+                {
+                    Console.WriteLine($"{name} на продажу нет нет");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"С таким {name} названием товара нет.");
+            }
+
+            return tempCell;
+        }
+
+        public void TakeProduct(Cell cell)
+        {
+            foreach (var product in _cells)
+            {
+                if (cell.Name == product.Name)
+                {
+                    product.TakeProduct();
+                    break;
+                }  
+            }
+        }
+
+        public void Show()
+        {
+            foreach (var cell in _cells)
+            {
+                if (cell.Amount != 0)
+                {
+                    Console.WriteLine($"Наименование - {cell.Name}.\n" +
+                                      $"Стоимость - {cell.Cost}.\n" +
+                                      $"Количество - {cell.Amount}.");
+                }
+            }
+        }
     }
 
     class Product
@@ -121,63 +206,32 @@ namespace TasksForJunior
             _cost = cost;
         }
 
-        public string Name { get { return _name; } private set { } }
-        public int Cost { get { return _cost; } private set { } }
+        public string Name { get => _name; }
+        public int Cost { get => _cost; }
     }
 
-    class Cell
+    class Cell : Product
     {
-        private List<Product> _products = new List<Product>();
-        public Cell()
+        public Cell(string name = null, int cost = 0, int amount = 0) : base(name, cost) => Amount = amount;
+
+        public int Amount { get; private set; }
+        public string Name => base.Name;
+        public int Cost => base.Cost;
+
+        public void TakeProduct() => Amount++;
+
+        public void SetProduct()
         {
-            foreach (var product in Enum.GetValues(typeof(ProductNamePrice)))
-                _products.Add(new Product(product.ToString(), (int)product));
-        }
+            if (Amount>0)
+                Amount--;
 
-        public Product GivProduct(string name)
-        {
-            Product temProduct = new Product();
-
-            bool haveProduct = false;
-
-            foreach (var product in _products)
-            {
-                if (product.Name == name)
-                {
-                    temProduct = product;
-                    haveProduct = true;
-                    break;
-                }
-            }
-
-            if (haveProduct)
-            {
-                _products.Remove(temProduct);
-                return temProduct;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        
-        public void TakeProduct(Product product) => _products.Add(product);
-
-        public void ShowThings()
-        {
-            if (_products.Count > 0)
-                foreach (var product in _products)
-                    Console.WriteLine($"Наименование товара: {product.Name}, цена товара: {product.Cost}");
-            else
-                Console.WriteLine("В магазине нет това. Все скупили.");
         }
     }
-
     class Shop
     {
         private Player _player = new Player();
         private Seller _seller = new Seller();
-        private Cell _cell = new Cell();
+        private Cell _cell;
 
         public Shop(Player player, Seller seller)
         {
@@ -214,7 +268,7 @@ namespace TasksForJunior
                         isTrade = false;
                         break;
                     case CommandShowProduct:
-                        _cell.ShowThings();
+                        _seller.Show();
                         break;
                     case CommandBuy:
                         Buy();
@@ -242,7 +296,7 @@ namespace TasksForJunior
         {
             Console.Write("Ведите название товара: ");
 
-            Product product = _player.GiveProduct(Console.ReadLine());
+            Cell product = _player.GiveProduct(Console.ReadLine());
 
             if (product == null)
             {
@@ -255,7 +309,7 @@ namespace TasksForJunior
             }
             else
             {
-                _cell.TakeProduct(product);
+                _seller.TakeProduct(product);
                 _player.TakeMoney(product.Cost);
             }
         }
@@ -264,21 +318,21 @@ namespace TasksForJunior
         {
             Console.Write("Ведите название товара: ");
 
-            Product product = _cell.GivProduct(Console.ReadLine());
+            _cell = _seller.GiveProduct(Console.ReadLine());
 
-            if (product == null)
+            if (_cell== null)
             {
                 Console.WriteLine("Такого товара нет! В магазине скупили весь товар или вы ввели неправильно название товара.");
             }
-            else if (_player.GiveMoney(product.Cost) == 0)
+            else if (_player.GiveMoney(_cell.Cost) == 0)
             {
-                _cell.TakeProduct(product);
+                _seller.TakeProduct(_cell);
                 Console.WriteLine("У игрока не хватает денег.");
             }
             else
             {
-                _player.TakeProduct(product);
-                _seller.TakeMoney(product.Cost);
+                _player.TakeProduct(_cell);
+                _seller.TakeMoney(_cell.Cost);
             }
         }
     }
