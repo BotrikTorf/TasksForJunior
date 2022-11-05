@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace TasksForJunior
 {
@@ -8,27 +10,20 @@ namespace TasksForJunior
         static void Main()
         {
             Player player = new Player(10);
-            Seller seller = new Seller(-1);
+            Seller seller = new Seller(0);
             Shop shop = new Shop(player, seller);
             shop.Trade();
         }
     }
-    enum ProductNamePrice
-    {
-        sword = 7,
-        axe = 8,
-        hammer = 9,
-        apple = 1,
-        pear = 2,
-        bread = 3,
-        water = 4,
-        milk = 5,
-        tea = 6
-    }
 
-    abstract class Peolple
+    abstract class Human
     {
-        protected Peolple(int money) => Money = money;
+        private readonly List<Cell> _cells;
+        protected Human(int money)
+        {
+            _cells = new List<Cell>();
+            Money = money;
+        }
 
         public int Money { get; private set; } = 0;
 
@@ -39,63 +34,29 @@ namespace TasksForJunior
                 Money -= requestedAmount;
                 return requestedAmount;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         protected void TakeMoney(int money) => Money += money;
-    }
 
-    class Player : Peolple
-    {
-        private List<Cell> _cells;
-
-        public Player(int money = 0) : base(money) => _cells = new List<Cell>();
-
-        public int Money => base.Money;
-
-        public void TakeProduct(Cell product)
+        protected Item GiveProduct(string name)
         {
-            bool haveProduct = false;
+            Item tempProduct = null;
 
             foreach (var cell in _cells)
             {
-                if (cell.Name == product.Name)
+                if (cell.NameItem == name)
                 {
-                    haveProduct = true;
-                    cell.TakeProduct();
-                }
-            }
-
-            if (!haveProduct)
-            {
-                _cells.Add(product);
-            }
-        }
-
-        public new void TakeMoney(int money) => base.TakeMoney(money);
-
-        public new int GiveMoney(int requestedAmount) => base.GiveMoney(requestedAmount);
-
-        public Cell GiveProduct(string name)
-        {
-            Cell tempProduct = null;
-
-            foreach (var product in _cells)
-            {
-                if (product.Name == name)
-                {
-                    if (product.Amount>1)
+                    if (cell.Amount == 1)
                     {
-                        product.SetProduct();
-                        tempProduct = new Cell(product.Name, product.Cost, 1);
+                        tempProduct = new Item(cell.NameItem, cell.CostItem);
+                        _cells.Remove(cell);
                     }
                     else
                     {
-                        tempProduct = new Cell(product.Name, product.Cost, 1);
-                        _cells.Remove(product);
+                        cell.ReduceNumberItem();
+                        tempProduct = new Item(cell.NameItem, cell.CostItem);
                     }
 
                     break;
@@ -104,134 +65,144 @@ namespace TasksForJunior
 
             return tempProduct;
         }
-        public void ShowThings()
+
+        public bool ChecksItem(string name, out int cost)
+        {
+            foreach (var cell in _cells)
+            {
+                if (cell.NameItem == name)
+                {
+                    cost = cell.CostItem;
+                    return true;
+                }
+            }
+
+            cost = 0;
+            return false;
+        }
+
+        protected void TakeProduct(Item item, int amount = 1)
+        {
+            bool haveProduct = false;
+
+            foreach (var cell in _cells)
+            {
+                if (cell.NameItem == item.Name)
+                {
+                    haveProduct = true;
+                    cell.IncreaseNumberItem();
+                    break;
+                }
+            }
+
+            if (!haveProduct)
+            {
+                _cells.Add(new Cell(item.Name, item.Cost, amount));
+            }
+        }
+
+        public void ShowProduct()
         {
             if (_cells.Count > 0)
-                foreach (var product in _cells)
-                    Console.WriteLine($"Наименование товара: {product.Name}, цена товара: {product.Cost}, количество {product.Amount}");
+            {
+                foreach (var cell in _cells)
+                    if (cell.Amount != 0)
+                        Console.WriteLine($"Наименование товара: {cell.NameItem}, цена товара: {cell.CostItem}, количество {cell.Amount}");
+            }
             else
+            {
                 Console.WriteLine("Вещей нет.");
+            }
         }
     }
 
-    class Seller : Peolple
+    class Player : Human
     {
-        private List<Cell> _cells;
-        private Random _random = new Random();
-        private int _minNumberProduct = 2;
-        private int _maxNumberProduct = 6;
+        public Player(int money = 0) : base(money) { }
 
+        public void BuyItem(Item item) => TakeProduct(item);
+
+        public int GiveMoneyItem(int number) => GiveMoney(number);
+
+        public bool ChecksMoney(int cost)
+        {
+            return cost <= Money;
+        }
+    }
+
+    class Seller : Human
+    {
         public Seller(int money = 0) : base(money)
         {
-            _cells = new List<Cell>();
+            Random random = new Random();
+            int minNumberProduct = 2;
+            int maxNumberProduct = 6;
 
-            foreach (var product in Enum.GetValues(typeof(ProductNamePrice)))
+            Dictionary<string, int> productsDictionary = new Dictionary<string, int>()
             {
-                _cells.Add(new Cell(product.ToString(), (int)product, _random.Next(_minNumberProduct, _maxNumberProduct)));
+                { "Apple", 1},
+                { "Pear", 2},
+                { "Bread", 3},
+                { "Water", 4},
+                { "Milk", 5},
+                { "Tea", 6},
+                { "Sword", 7},
+                { "Axe", 8},
+                { "Hammer", 9}
+            };
+
+            foreach (var product in productsDictionary)
+            {
+                Item item = new Item(product.Key, product.Value);
+                base.TakeProduct(item, random.Next(minNumberProduct, maxNumberProduct));
             }
         }
 
-        public int Money => base.Money;
+        public Item SaleItem(string name) => GiveProduct(name);
 
-        public new void TakeMoney(int money) => base.TakeMoney(money);
-
-        public new int GiveMoney(int requestedAmount) => base.GiveMoney(requestedAmount);
-
-        public Cell GiveProduct(string name)
-        {
-            Cell tempCell = null;
-
-            foreach (var cell in _cells)
-            {
-                if (cell.Name == name)
-                {
-                    tempCell = cell;
-                    break;
-                }
-            }
-
-            if (tempCell != null)
-            {
-                if (tempCell.Amount>0)
-                {
-                    tempCell.SetProduct();
-                    tempCell = new Cell(tempCell.Name, tempCell.Cost, 1);
-                }
-                else
-                {
-                    Console.WriteLine($"{name} на продажу нет нет");
-                }
-            }
-            else
-            {
-                Console.WriteLine($"С таким {name} названием товара нет.");
-            }
-
-            return tempCell;
-        }
-
-        public void TakeProduct(Cell cell)
-        {
-            foreach (var product in _cells)
-            {
-                if (cell.Name == product.Name)
-                {
-                    product.TakeProduct();
-                    break;
-                }  
-            }
-        }
-
-        public void Show()
-        {
-            foreach (var cell in _cells)
-            {
-                if (cell.Amount != 0)
-                {
-                    Console.WriteLine($"Наименование - {cell.Name}.\n" +
-                                      $"Стоимость - {cell.Cost}.\n" +
-                                      $"Количество - {cell.Amount}.");
-                }
-            }
-        }
+        public void TakeMoneyItem(int number) => TakeMoney(number);
     }
 
-    class Product
+    class Item
     {
-        private string _name;
-        private int _cost;
-        public Product(string name = null, int cost = 0)
+        public Item(string name = null, int cost = 0)
         {
-            _name = name;
-            _cost = cost;
+            Name = name;
+            Cost = cost;
         }
 
-        public string Name { get => _name; }
-        public int Cost { get => _cost; }
+        public string Name { get; }
+        public int Cost { get; }
     }
 
-    class Cell : Product
+    class Cell
     {
-        public Cell(string name = null, int cost = 0, int amount = 0) : base(name, cost) => Amount = amount;
+        private Item _item;
+
+        public Cell(string name = null, int cost = 0, int amount = 0)
+        {
+            _item = new Item(name, cost);
+            Amount = amount;
+        }
 
         public int Amount { get; private set; }
-        public string Name => base.Name;
-        public int Cost => base.Cost;
 
-        public void TakeProduct() => Amount++;
+        public string NameItem => _item.Name;
 
-        public void SetProduct()
+        public int CostItem => _item.Cost;
+
+        public void IncreaseNumberItem() => Amount++;
+
+        public void ReduceNumberItem()
         {
-            if (Amount>0)
+            if (Amount > 0)
                 Amount--;
-
         }
     }
     class Shop
     {
         private Player _player = new Player();
         private Seller _seller = new Seller();
-        private Cell _cell;
 
         public Shop(Player player, Seller seller)
         {
@@ -244,7 +215,6 @@ namespace TasksForJunior
             const string CommandExit = "exit";
             const string CommandShowProduct = "show";
             const string CommandBuy = "buy";
-            const string CommandSell = "sell";
             const string CommandViewBalance = "balance";
             const string CommandShowThings = "player";
 
@@ -253,7 +223,6 @@ namespace TasksForJunior
             Console.WriteLine("Добро пожаловать в наш маленький магазинчик!\n" +
                               $"{CommandShowProduct} - посмотреть товар.\n" +
                               $"{CommandBuy} - покупка товара.\n" +
-                              $"{CommandSell} - продажа товара.\n" +
                               $"{CommandExit} - прекращениe торговли.\n" +
                               $"{CommandViewBalance} - просмотр баланса у продовца и игрока.\n" +
                               $"{CommandShowThings} - показать вещи игрока.");
@@ -268,19 +237,16 @@ namespace TasksForJunior
                         isTrade = false;
                         break;
                     case CommandShowProduct:
-                        _seller.Show();
+                        _seller.ShowProduct();
                         break;
                     case CommandBuy:
                         Buy();
-                        break;
-                    case CommandSell:
-                        Sell();
                         break;
                     case CommandViewBalance:
                         ViewBalance();
                         break;
                     case CommandShowThings:
-                        _player.ShowThings();
+                        _player.ShowProduct();
                         break;
                     default:
                         Console.WriteLine("Вы не правельно ввели команду! Попробуйте еще раз");
@@ -292,47 +258,36 @@ namespace TasksForJunior
         private void ViewBalance() => Console.WriteLine($"Баланс денег у игрока: {_player.Money}.\n" +
                                                         $"Баланс денег у продовца: {_seller.Money}.");
 
-        private void Sell()
-        {
-            Console.Write("Ведите название товара: ");
-
-            Cell product = _player.GiveProduct(Console.ReadLine());
-
-            if (product == null)
-            {
-                Console.WriteLine("Такого товара нет! Вы ввели неправельно нозвание товара или у игрока такого товара нет.");
-            }
-            else if (_seller.GiveMoney(product.Cost) == 0)
-            {
-                _player.TakeProduct(product);
-                Console.WriteLine("У продовца не хватает денег.");
-            }
-            else
-            {
-                _seller.TakeProduct(product);
-                _player.TakeMoney(product.Cost);
-            }
-        }
-
         private void Buy()
         {
             Console.Write("Ведите название товара: ");
 
-            _cell = _seller.GiveProduct(Console.ReadLine());
+            string name = Console.ReadLine().ToLower();
 
-            if (_cell== null)
+            if (name.Length >0)
             {
-                Console.WriteLine("Такого товара нет! В магазине скупили весь товар или вы ввели неправильно название товара.");
-            }
-            else if (_player.GiveMoney(_cell.Cost) == 0)
-            {
-                _seller.TakeProduct(_cell);
-                Console.WriteLine("У игрока не хватает денег.");
+                name = name[0].ToString().ToUpper() + name.Substring(1);
+
+                if (_seller.ChecksItem(name, out int cost))
+                {
+                    if (_player.ChecksMoney(cost))
+                    {
+                        _seller.TakeMoneyItem(_player.GiveMoneyItem(cost));
+                        _player.BuyItem(_seller.SaleItem(name));
+                    }
+                    else
+                    {
+                        Console.WriteLine("У игрока не хватает денег.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Такого товара нет! В магазине скупили весь товар или вы ввели неправильно название товара.");
+                }
             }
             else
             {
-                _player.TakeProduct(_cell);
-                _seller.TakeMoney(_cell.Cost);
+                Console.WriteLine("Вы ничего не ввели");
             }
         }
     }
