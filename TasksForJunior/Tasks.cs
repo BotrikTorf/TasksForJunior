@@ -235,7 +235,7 @@ namespace TasksForJunior
                         isTrade = false;
                         break;
                     case CommandShowProduct:
-                        _seller.ShowProduct();
+                        _seller.ShowProducts();
                         break;
                     case CommandBuy:
                         Buy();
@@ -244,7 +244,7 @@ namespace TasksForJunior
                         ViewBalance();
                         break;
                     case CommandShowThings:
-                        _player.ShowProduct();
+                        _player.ShowProducts();
                         break;
                     default:
                         Console.WriteLine("Вы не правельно ввели команду! Попробуйте еще раз");
