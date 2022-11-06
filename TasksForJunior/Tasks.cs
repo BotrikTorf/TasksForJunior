@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
 
 namespace TasksForJunior
 {
@@ -66,7 +64,7 @@ namespace TasksForJunior
             return tempProduct;
         }
 
-        public bool ChecksItem(string name, out int cost)
+        public bool HaveItem(string name, out int cost)
         {
             foreach (var cell in _cells)
             {
@@ -95,13 +93,13 @@ namespace TasksForJunior
                 }
             }
 
-            if (!haveProduct)
+            if (haveProduct==false)
             {
                 _cells.Add(new Cell(item.Name, item.Cost, amount));
             }
         }
 
-        public void ShowProduct()
+        public void ShowProducts()
         {
             if (_cells.Count > 0)
             {
@@ -268,7 +266,7 @@ namespace TasksForJunior
             {
                 name = name[0].ToString().ToUpper() + name.Substring(1);
 
-                if (_seller.ChecksItem(name, out int cost))
+                if (_seller.HaveItem(name, out int cost))
                 {
                     if (_player.ChecksMoney(cost))
                     {
