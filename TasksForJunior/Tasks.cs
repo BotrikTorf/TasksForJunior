@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TasksForJunior
 {
@@ -19,6 +18,24 @@ namespace TasksForJunior
         {
             StationStart = stationStart;
             StationEnd = stationEnd;
+        }
+    enum WagonCapacity
+    {
+        Small,
+        Average,
+        Big
+    }
+
+    class Direction
+    {
+        private readonly List<String> _stations;
+
+        public Direction()
+        {
+            _stations = new List<string>();
+
+            foreach (var city in Enum.GetValues(typeof(City)))
+                _stations.Add(city.ToString());
         }
 
         public string StationStart { get; }
