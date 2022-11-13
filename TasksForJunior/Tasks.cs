@@ -19,24 +19,6 @@ namespace TasksForJunior
             StationStart = stationStart;
             StationEnd = stationEnd;
         }
-    enum WagonCapacity
-    {
-        Small,
-        Average,
-        Big
-    }
-
-    class Direction
-    {
-        private readonly List<String> _stations;
-
-        public Direction()
-        {
-            _stations = new List<string>();
-
-            foreach (var city in Enum.GetValues(typeof(City)))
-                _stations.Add(city.ToString());
-        }
 
         public string StationStart { get; }
         public string StationEnd { get; }
@@ -144,7 +126,7 @@ namespace TasksForJunior
                 {
                     Console.WriteLine("Вы выбрали один и тот же город или такого города нет. Маршрут не может быть создан.");
                 }
-            } 
+            }
             while (stationStart == stationEnd);
 
             return new Direction(stationStart, stationEnd);
