@@ -44,7 +44,7 @@ namespace TasksForJunior
 
     class Wagon
     {
-        public Wagon(string title = null, int numberSeats = 0)
+        public Wagon(string title, int numberSeats)
         {
             NumberSeats = numberSeats;
             Title = title;
@@ -56,67 +56,74 @@ namespace TasksForJunior
 
     class Train
     {
-        public Train(string route = null, int capacity = 0, int numberPassengers = 0, int number = 0)
+        public Train(string route, int capacity, int numberPassengers, int number, List<Wagon> wagons)
         {
             Route = route;
             Capacity = capacity;
             NumberPassengers = numberPassengers;
             Number = number;
+            List<Wagon> Wagons = wagons;
         }
 
         public string Route { get; }
         public int Capacity { get; }
         public int NumberPassengers { get; }
         public int Number { get; }
+        public List<Wagon> Wagons { get; }
 
         public void Show()
         {
             Console.WriteLine($"{Number} - номер поезда\n" +
                               $"{Route} - маршрут поезда\n" +
                               $"{Capacity} - вместимость поезда\n" +
-                              $"{NumberPassengers} - в поезд село посажиров");
+                              $"{NumberPassengers} - в поезд село посажиров" +
+                              "В состав поезда входят вагоны:");
+
+            foreach (var wagon in Wagons)
+            {
+                Console.WriteLine($"{wagon.Title} - вагон, в него помещается - {wagon.Title} пассажиров.");
+            }
         }
     }
 
     class Terminal
     {
-        private Direction direction;
-        private List<Train> trains = new List<Train>();
-        private Wagon wagon;
+        private List<Train> _trains = new List<Train>();
         private Random random = new Random();
-        private int minNamberTicket = 0;
-        private int maxNamberTicket = 500;
 
         public void WorkStart()
         {
+            string commandExit = "exit";
             bool isWork = true;
+            int minNamberTicket = 0;
+            int maxNamberTicket = 500;
 
             Console.WriteLine("Добро пожаловать в терминал.");
 
             while (isWork)
             {
-                if (trains.Count < 1)
+                if (_trains.Count < 1)
                     Console.WriteLine("Вы не отправили ни одного поезда");
                 else
                     ShowTrains();
 
                 int ticketsSales = random.Next(minNamberTicket, maxNamberTicket);
 
-                direction = CreateDirection();
+                Direction direction = CreateDirection();
 
                 Console.WriteLine($"Вы выбрали направление {direction.StationStart} - {direction.StationEnd}");
                 Console.WriteLine($"Вы продали {ticketsSales}");
-                wagon = ChoiceWagon();
-                SendTrain(ticketsSales);
+                List<Wagon> wagons = CreatesListWagons(ticketsSales);
+                SendTrain(ticketsSales, direction, wagons);
 
-                Console.Write($"Если вы хотите выйти из программы то введите слово exit: ");
-                isWork = Console.ReadLine() != "exit";
+                Console.Write($"Если вы хотите выйти из программы то введите слово {commandExit}: ");
+                isWork = Console.ReadLine() != commandExit;
             }
         }
 
         private Direction CreateDirection()
         {
-            List<string> stations = new List<string>()
+            List<string> stations = new List<string>
             {
                 "Minsk", "Brest", "Vitebsk", "Gomel", "Grodno", "Mogilev",
                 "Baranovichi", "Orsha", "Polotsk", "Osipovichi", "Kalinkovichi"
@@ -126,24 +133,24 @@ namespace TasksForJunior
 
             ShowStations(stations);
 
-            Console.WriteLine("Выберете город из списка с которого начинается маршрут:");
-            stationStart = SetStation(stations);
-            Console.WriteLine("Выберете город из списка на котором заканчиватся маршрут:");
-            stationEnd = SetStation(stations);
-
-            while (stationStart == stationEnd)
+            do
             {
-                Console.WriteLine("Вы выбрали один и тот же город или такого города нет. Маршрут не может быть создан.");
                 Console.WriteLine("Выберете город из списка с которого начинается маршрут:");
-                stationStart = SetStation(stations);
+                stationStart = SelectStation(stations);
                 Console.WriteLine("Выберете город из списка на котором заканчиватся маршрут:");
-                stationEnd = SetStation(stations);
-            }
+                stationEnd = SelectStation(stations);
+
+                if (stationStart == stationEnd)
+                {
+                    Console.WriteLine("Вы выбрали один и тот же город или такого города нет. Маршрут не может быть создан.");
+                }
+            } 
+            while (stationStart == stationEnd);
 
             return new Direction(stationStart, stationEnd);
         }
 
-        private string SetStation(List<string> stations)
+        private string SelectStation(List<string> stations)
         {
             string station = null;
             bool isEnteredStantionStart = true;
@@ -178,22 +185,32 @@ namespace TasksForJunior
             }
         }
 
-        private void SendTrain(int ticketsSales)
+        private void SendTrain(int ticketsSales, Direction direction, List<Wagon> wagons)
         {
-            int numberWagons = MinWagonCount(ticketsSales);
+            string commandAccept = "yes";
+            int seats = 0;
 
             Console.WriteLine("К отправке готов поезд:\n" +
-                              $"Номер поезда {trains.Count}\n" +
+                              $"Номер поезда {_trains.Count}\n" +
                               $"Следующий по маршруту {direction.StationStart} - {direction.StationEnd}\n" +
-                              $"Вместимость поезда {numberWagons * wagon.NumberSeats}\n" +
-                              $"В поезд сядет {ticketsSales} пасажиров.\n");
-            Console.Write("Если все данные верны введите yes: ");
+                              "Состоящий из вагонов:");
 
-            if (Console.ReadLine() == "yes")
+            foreach (var wagon in wagons)
             {
-                Train train = new Train(direction.StationStart + " - " + direction.StationEnd, numberWagons * wagon.NumberSeats,
-                    ticketsSales, trains.Count);
-                trains.Add(train);
+                seats += wagon.NumberSeats;
+
+                Console.WriteLine($"{wagon.Title} - вагон, в него помещается - {wagon.Title} пассажиров.");
+            }
+
+            Console.Write($"Вместимость поезда {seats}\n" +
+                              $"В поезд сядет {ticketsSales} пасажиров.\n" +
+                              $"Если все данные верны введите {commandAccept}: ");
+
+            if (Console.ReadLine().ToLower() == commandAccept)
+            {
+                Train train = new Train(direction.StationStart + " - " + direction.StationEnd,
+                    seats, ticketsSales, _trains.Count, wagons);
+                _trains.Add(train);
             }
             else
             {
@@ -201,14 +218,12 @@ namespace TasksForJunior
             }
         }
 
-        private int MinWagonCount(int ticketsSales)
+        private List<Wagon> CreatesListWagons(int ticketsSales)
         {
-            return (int)Math.Truncate((double)ticketsSales / wagon.NumberSeats) + 1;
-        }
+            List<Wagon> wagons = new List<Wagon>();
+            int seats;
 
-        private Wagon ChoiceWagon()
-        {
-            Dictionary<string, int> wagons = new Dictionary<string, int>()
+            Dictionary<string, int> wagonsDictionary = new Dictionary<string, int>()
             {
                 { "Suite", 24 },
                 { "SV", 32 },
@@ -219,22 +234,39 @@ namespace TasksForJunior
 
             Console.WriteLine("У вас есть в наличии вагоны:");
 
-            foreach (var wagon in wagons)
+            foreach (var wagon in wagonsDictionary)
             {
                 Console.WriteLine($"{wagon.Key} на {wagon.Value} мест");
             }
 
-            Console.WriteLine("Какой тип вагонов вы хотите выбрать? Ведите название:");
+            do
+            {
+                wagons.Add(SelectWagon(wagonsDictionary));
+                seats = 0;
 
+                foreach (Wagon wagon in wagons)
+                {
+                    seats += wagon.NumberSeats;
+                }
+            }
+            while (seats < ticketsSales);
+
+            return wagons;
+        }
+
+        private Wagon SelectWagon(Dictionary<string, int> wagonsDictionary)
+        {
             bool isChoice = true;
             string wagonName = null;
             int numberSeats = 0;
 
+            Console.WriteLine("Какой тип вагонов вы хотите выбрать? Ведите название:");
+
             while (isChoice)
             {
-                 wagonName = Console.ReadLine();
+                wagonName = Console.ReadLine();
 
-                foreach (var wagon in wagons)
+                foreach (var wagon in wagonsDictionary)
                 {
                     if (wagon.Key == wagonName)
                     {
@@ -255,7 +287,7 @@ namespace TasksForJunior
 
         private void ShowTrains()
         {
-            foreach (var train in trains)
+            foreach (var train in _trains)
             {
                 Console.WriteLine("Вы отправили:");
                 train.Show();
