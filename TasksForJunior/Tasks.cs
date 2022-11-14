@@ -38,20 +38,20 @@ namespace TasksForJunior
 
     class Train
     {
+        private List<Wagon> _wagons;
         public Train(string route, int capacity, int numberPassengers, int number, List<Wagon> wagons)
         {
             Route = route;
             Capacity = capacity;
             NumberPassengers = numberPassengers;
             Number = number;
-            List<Wagon> Wagons = wagons;
+            _wagons = wagons;
         }
 
         public string Route { get; }
         public int Capacity { get; }
         public int NumberPassengers { get; }
         public int Number { get; }
-        public List<Wagon> Wagons { get; }
 
         public void Show()
         {
@@ -61,7 +61,7 @@ namespace TasksForJunior
                               $"{NumberPassengers} - в поезд село посажиров" +
                               "В состав поезда входят вагоны:");
 
-            foreach (var wagon in Wagons)
+            foreach (var wagon in _wagons)
             {
                 Console.WriteLine($"{wagon.Title} - вагон, в него помещается - {wagon.Title} пассажиров.");
             }
@@ -71,7 +71,7 @@ namespace TasksForJunior
     class Terminal
     {
         private List<Train> _trains = new List<Train>();
-        private Random random = new Random();
+        private Random _random = new Random();
 
         public void WorkStart()
         {
@@ -89,7 +89,7 @@ namespace TasksForJunior
                 else
                     ShowTrains();
 
-                int ticketsSales = random.Next(minNamberTicket, maxNamberTicket);
+                int ticketsSales = _random.Next(minNamberTicket, maxNamberTicket);
 
                 Direction direction = CreateDirection();
 
@@ -254,7 +254,6 @@ namespace TasksForJunior
                     {
                         numberSeats = wagon.Value;
                         isChoice = false;
-                        break;
                     }
                 }
 
