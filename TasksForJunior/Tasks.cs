@@ -54,6 +54,11 @@ namespace TasksForJunior
 
         static Character SelectionCharacter()
         {
+            const int KeyFirst = 1;
+            const int KeySecond = 2;
+            const int KeyThird = 3;
+            const int KeyFourth = 4;
+            const int KeyFifth = 5;
             Character character = null;
 
             while (character == null)
@@ -64,19 +69,19 @@ namespace TasksForJunior
                 {
                     switch (result)
                     {
-                        case 1:
+                        case KeyFirst:
                             character = new Warrior();
                             break;
-                        case 2:
+                        case KeySecond:
                             character = new Thief();
                             break;
-                        case 3:
+                        case KeyThird:
                             character = new Berserker();
                             break;
-                        case 4:
+                        case KeyFourth:
                             character = new Magician();
                             break;
-                        case 5:
+                        case KeyFifth:
                             character = new Priest();
                             break;
                         default:
@@ -156,6 +161,7 @@ namespace TasksForJunior
             _maxManna = _manna;
             Armor = (int)(Strength * 0.5f + Dexterity * 0.5f);
             MagicArmor = (int)(Dexterity * 0.5F + Intellect * 0.5F);
+            MinDamage = 0;
         }
 
         public int Strength { get; }
@@ -165,14 +171,14 @@ namespace TasksForJunior
         public int Dexterity { get; }
 
         public string Name { get; }
-        
+
         public int Manna
         {
             get
             {
                 return _manna;
             }
-            set
+            private protected set
             {
                 if (value < 0)
                     _manna = 0;
@@ -189,7 +195,7 @@ namespace TasksForJunior
             {
                 return _health;
             }
-            set
+            private protected set
             {
                 if (value < 0)
                     _health = 0;
@@ -203,6 +209,8 @@ namespace TasksForJunior
         public int Armor { get; }
 
         public int MagicArmor { get; }
+
+        public int MinDamage { get; }
 
         public virtual void TakeDamage(ref int physicalDamage, ref int magicDamage) { }
 
@@ -222,9 +230,11 @@ namespace TasksForJunior
 
         public void RegenerateManna()
         {
+            double factorRegeneration = 10.0;
+
             if (_manna < _maxManna)
             {
-                int speedRegeneration = Intellect / 10;
+                int speedRegeneration = (int)(Intellect / factorRegeneration);
                 _manna = (_manna + speedRegeneration > _maxManna) ? _maxManna : _manna + speedRegeneration;
             }
         }
@@ -232,13 +242,11 @@ namespace TasksForJunior
         public bool HasCriticalDamage()
         {
             Random random = new Random();
+            int minValue = 1;
+            int maxValue = Dexterity + Intellect + Strength + 1;
+            double coefficientIntelligence = 2.0;
 
-            int numberRandom = random.Next(1, 101);
-
-            if (numberRandom <= Dexterity + (int)(Intellect / 2))
-                return true;
-
-            return false;
+            return (random.Next(minValue, maxValue) <= Dexterity + (int)(Intellect / coefficientIntelligence));
         }
     }
 
@@ -253,8 +261,12 @@ namespace TasksForJunior
 
         public override void TakeDamage(ref int physicalDamage, ref int magicDamage)
         {
-            int physicalIncomingDamage = (physicalDamage - Armor) < 0 ? 0 : physicalDamage - Armor;
-            int magicIncomingDamage = (magicDamage - MagicArmor) < 0 ? 0 : magicDamage - MagicArmor;
+            int physicalIncomingDamage = (physicalDamage - Armor) < MinDamage
+                ? MinDamage
+                : physicalDamage - Armor;
+            int magicIncomingDamage = (magicDamage - MagicArmor) < MinDamage
+                ? MinDamage
+                : magicDamage - MagicArmor;
             Health -= physicalIncomingDamage + magicIncomingDamage;
         }
 
@@ -270,16 +282,18 @@ namespace TasksForJunior
 
         private void CalculatesDamageFirstAbility(out int physicalDamage, out int magicDamage)
         {
-            magicDamage = 0;
+            magicDamage = MinDamage;
             Console.WriteLine("Наносит прямой удар мечем");
-            physicalDamage = HasCriticalDamage() ? (int)(Strength * _critDamageRatio) : (int)(Strength * _physicalDamageRatio);
+            physicalDamage = HasCriticalDamage()
+                ? (int)(Strength * _critDamageRatio)
+                : (int)(Strength * _physicalDamageRatio);
         }
 
         private void CalculatesDamageSecondAbility(out int physicalDamage, out int magicDamage)
         {
             Console.WriteLine($"Использовав {_spellCost} едениц манны повышает шанс крит удара на 50% и бьет боковым ударом");
             Manna -= _spellCost;
-            magicDamage = 0;
+            magicDamage = MinDamage;
             if (HasCriticalDamage())
                 physicalDamage = (int)(Strength * _critDamageRatio);
             else if (HasCriticalDamage())
@@ -301,8 +315,8 @@ namespace TasksForJunior
 
         public override void TakeDamage(ref int physicalDamage, ref int magicDamage)
         {
-            int physicalIncomingDamage = (physicalDamage - Armor) < 0 ? 0 : physicalDamage - Armor;
-            int magicIncomingDamage = (magicDamage - MagicArmor) < 0 ? 0 : magicDamage - MagicArmor;
+            int physicalIncomingDamage = (physicalDamage - Armor) < MinDamage ? MinDamage : physicalDamage - Armor;
+            int magicIncomingDamage = (magicDamage - MagicArmor) < MinDamage ? MinDamage : magicDamage - MagicArmor;
             Health -= physicalIncomingDamage + magicIncomingDamage;
         }
 
@@ -318,7 +332,7 @@ namespace TasksForJunior
 
         private void CalculatesDamageFirstAbility(out int physicalDamage, out int magicDamage)
         {
-            magicDamage = 0;
+            magicDamage = MinDamage;
             Console.WriteLine("Наносит прямой удар кинжалами");
             physicalDamage = HasCriticalDamage() ? (int)(Strength * _critDamageRatio) : (int)(Strength * _physicalDamageRatio);
         }
@@ -337,14 +351,15 @@ namespace TasksForJunior
         private int _spellCost = 60;
         private float _physicalDamageRatio = 0.6f;
         private float _critDamageRatio = 2.5f;
+        private float _increasedDamage = 1.5f;
 
         public Berserker(int strength = 80, int intellect = 10,
             int dexterity = 10, string name = "Berserker") : base(strength, intellect, dexterity, name) { }
 
         public override void TakeDamage(ref int physicalDamage, ref int magicDamage)
         {
-            int physicalIncomingDamage = (physicalDamage - Armor) < 0 ? 0 : physicalDamage - Armor;
-            int magicIncomingDamage = (magicDamage - MagicArmor) < 0 ? 0 : magicDamage - MagicArmor;
+            int physicalIncomingDamage = (physicalDamage - Armor) < MinDamage ? MinDamage : physicalDamage - Armor;
+            int magicIncomingDamage = (magicDamage - MagicArmor) < MinDamage ? MinDamage : magicDamage - MagicArmor;
             Health -= physicalIncomingDamage + magicIncomingDamage;
         }
 
@@ -360,17 +375,20 @@ namespace TasksForJunior
 
         private void CalculatesDamageFirstAbility(out int physicalDamage, out int magicDamage)
         {
-            magicDamage = 0;
+            magicDamage = MinDamage;
             Console.WriteLine("Наносит рубящий удар топором");
             physicalDamage = HasCriticalDamage() ? (int)(Strength * _critDamageRatio) : (int)(Strength * _physicalDamageRatio);
         }
 
         private void CalculatesDamageSecondAbility(out int physicalDamage, out int magicDamage)
         {
-            Console.WriteLine($"Использовав {_spellCost} едениц манны и бьет круговым ударом увеличив на 50% урон");
+            Console.WriteLine($"Использовав {_spellCost} едениц манны и бьет круговым ударом " +
+                              $"увеличив на {_increasedDamage * 100 - 100}% урон");
             Manna -= _spellCost;
-            magicDamage = 0;
-            physicalDamage = HasCriticalDamage() ? (int)(Strength * _critDamageRatio * 1.5f) : (int)(Strength * _physicalDamageRatio * 1.5);
+            magicDamage = MinDamage;
+            physicalDamage = HasCriticalDamage()
+                ? (int)(Strength * _critDamageRatio * _increasedDamage)
+                : (int)(Strength * _physicalDamageRatio * _increasedDamage);
         }
     }
 
@@ -390,15 +408,15 @@ namespace TasksForJunior
             if (Manna > _spellCost)
             {
                 int physicalIncomingDamage = physicalDamage - Armor * (int)(1.0 + _armorIncreasePercentage / 100) < 0
-                    ? 0
+                    ? MinDamage
                     : physicalDamage - Armor * (int)(1.0 + _armorIncreasePercentage / 100);
-                int magicIncomingDamage = magicDamage - MagicArmor < 0 ? 0 : magicDamage - MagicArmor;
+                int magicIncomingDamage = magicDamage - MagicArmor < MinDamage ? MinDamage : magicDamage - MagicArmor;
                 Health -= physicalIncomingDamage + magicIncomingDamage;
             }
             else
             {
-                int physicalIncomingDamage = physicalDamage - Armor < 0 ? 0 : physicalDamage - Armor;
-                int magicIncomingDamage = magicDamage - MagicArmor < 0 ? 0 : magicDamage - MagicArmor;
+                int physicalIncomingDamage = physicalDamage - Armor < MinDamage ? MinDamage : physicalDamage - Armor;
+                int magicIncomingDamage = magicDamage - MagicArmor < MinDamage ? MinDamage : magicDamage - MagicArmor;
                 Health -= physicalIncomingDamage + magicIncomingDamage;
             }
         }
@@ -415,7 +433,7 @@ namespace TasksForJunior
 
         private void CalculatesDamageFirstAbility(out int physicalDamage, out int magicDamage)
         {
-            magicDamage = 0;
+            magicDamage = MinDamage;
             Console.WriteLine("Бьет посохом.");
             physicalDamage = HasCriticalDamage() ? (int)(Strength * _critDamageRatio) : (int)(Strength * _physicalDamageRatio);
         }
@@ -426,7 +444,7 @@ namespace TasksForJunior
                               $"на {_armorIncreasePercentage}% и наносит урон заклинанием");
             Manna -= _spellCost;
             magicDamage = HasCriticalDamage() ? (int)(Intellect * _critDamageRatio) : (int)(Intellect * _magicDamageRatio);
-            physicalDamage = 0;
+            physicalDamage = MinDamage;
         }
     }
 
@@ -436,14 +454,15 @@ namespace TasksForJunior
         private float _physicalDamageRatio = 3.7f;
         private float _magicDamageRatio = 1.8f;
         private float _critDamageRatio = 3.4f;
+        private float _treatmentFactor = 2.5f;
 
         public Priest(int strength = 15, int intellect = 80,
             int dexterity = 5, string name = "Priest3") : base(strength, intellect, dexterity, name) { }
 
         public override void TakeDamage(ref int physicalDamage, ref int magicDamage)
         {
-            int physicalIncomingDamage = (physicalDamage - Armor) < 0 ? 0 : physicalDamage - Armor;
-            int magicIncomingDamage = (magicDamage - MagicArmor) < 0 ? 0 : magicDamage - MagicArmor;
+            int physicalIncomingDamage = (physicalDamage - Armor) < MinDamage ? MinDamage : physicalDamage - Armor;
+            int magicIncomingDamage = (magicDamage - MagicArmor) < MinDamage ? MinDamage : magicDamage - MagicArmor;
             Health -= physicalIncomingDamage + magicIncomingDamage;
         }
 
@@ -459,7 +478,7 @@ namespace TasksForJunior
 
         private void CalculatesDamageFirstAbility(out int physicalDamage, out int magicDamage)
         {
-            magicDamage = 0;
+            magicDamage = MinDamage;
             Console.WriteLine("Наносит посохом");
             physicalDamage = HasCriticalDamage() ? (int)(Strength * _critDamageRatio) : (int)(Strength * _physicalDamageRatio);
         }
@@ -468,9 +487,9 @@ namespace TasksForJunior
         {
             Console.WriteLine($"Использовав {_spellCost} едениц манны наносит урон заклинанием, также лечит себя. ");
             Manna -= _spellCost;
-            physicalDamage = 0;
+            physicalDamage = MinDamage;
             magicDamage = HasCriticalDamage() ? (int)(Intellect * _critDamageRatio) : (int)(Intellect * _magicDamageRatio);
-            Health += (int)(magicDamage / 2.5);
+            Health += (int)(magicDamage / _treatmentFactor);
         }
     }
 }
