@@ -54,11 +54,14 @@ namespace TasksForJunior
 
         static Character SelectionCharacter()
         {
-            const int KeyFirst = 1;
-            const int KeySecond = 2;
-            const int KeyThird = 3;
-            const int KeyFourth = 4;
-            const int KeyFifth = 5;
+            List<Character> characters = new List<Character>()
+            {
+                new Warrior(),
+                new Thief(),
+                new Berserker(),
+                new Magician(),
+                new Priest()
+            };
             Character character = null;
 
             while (character == null)
@@ -67,31 +70,14 @@ namespace TasksForJunior
 
                 if (int.TryParse(Console.ReadLine(), out int result))
                 {
-                    switch (result)
-                    {
-                        case KeyFirst:
-                            character = new Warrior();
-                            break;
-                        case KeySecond:
-                            character = new Thief();
-                            break;
-                        case KeyThird:
-                            character = new Berserker();
-                            break;
-                        case KeyFourth:
-                            character = new Magician();
-                            break;
-                        case KeyFifth:
-                            character = new Priest();
-                            break;
-                        default:
-                            Console.WriteLine("Персонажа под таким номером не существует.");
-                            break;
-                    }
+                    if (result > 0 && result <= characters.Count)
+                        character = characters[result - 1];
+                    else
+                        Console.WriteLine("Персонажа под таким номером не существует.");
                 }
                 else
                 {
-                    Console.WriteLine("Вы не правильно ввели номе.");
+                    Console.WriteLine("Вы не правильно ввели номер.");
                 }
             }
 
