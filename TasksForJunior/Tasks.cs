@@ -5,27 +5,34 @@ namespace TasksForJunior
 {
     class Tasks
     {
-        static Random _random = new Random();
         static void Main()
         {
-            Queue<Buyer> buyers = CreatingCustomerQueues();
+            Supermarket supermarket = new Supermarket();
+            supermarket.CalculateClients();
+        }
+    }
 
-            CalculateClients(buyers);
-            Console.ReadLine();
+    class Supermarket
+    {
+        private Queue<Buyer> _buyers;
+        private Random _random = new Random();
+        public Supermarket()
+        {
+            CreateCustomerQueue();
         }
 
-        private static void CalculateClients(Queue<Buyer> buyers)
+        public void CalculateClients()
         {
             int numberBuyer = 1;
 
-            while (buyers.Count > 0)
+            while (_buyers.Count > 0)
             {
-                Console.WriteLine($"В очереде {buyers.Count} покупателей.");
-                Buyer buyer = buyers.Dequeue();
+                Console.WriteLine($"В очереде {_buyers.Count} покупателей.");
+                Buyer buyer = _buyers.Dequeue();
                 Console.WriteLine($"У {numberBuyer} покупателя {buyer.Money} монет. Он взял товар для попукупки:");
                 buyer.ShowProduct();
 
-                if (buyer.ThisMadePayment(CalculateTotalCostGoods(buyer.SubmitProductList())))
+                if (buyer.CompletedPayment())
                 {
                     Console.WriteLine("У покупателя хватило денег на все товары. Он удаляется из очереди.");
                 }
@@ -40,7 +47,7 @@ namespace TasksForJunior
                         Console.WriteLine("Остался товар для попукупки:");
                         buyer.ShowProduct();
 
-                        if (buyer.ThisMadePayment(CalculateTotalCostGoods(buyer.SubmitProductList())))
+                        if (buyer.CompletedPayment())
                         {
                             Console.WriteLine("У покупателя хватило денег на все товары. Он удаляется из очереди.");
                             haveMoney = true;
@@ -52,17 +59,7 @@ namespace TasksForJunior
             }
         }
 
-        private static int CalculateTotalCostGoods(List<Product> products)
-        {
-            int totalCost = 0;
-
-            foreach (var product in products)
-                totalCost += product.Price;
-
-            return totalCost;
-        }
-
-        private static Queue<Buyer> CreatingCustomerQueues()
+        private void CreateCustomerQueue()
         {
             int minLengthQueue = 3;
             int maxLengthQueue = 5;
@@ -72,10 +69,10 @@ namespace TasksForJunior
             for (int i = 0; i < lengthQueue; i++)
                 buyers.Enqueue(new Buyer(GreateShoppingList()));
 
-            return buyers;
+            _buyers = buyers;
         }
 
-        private static List<Product> GreateShoppingList()
+        private List<Product> GreateShoppingList()
         {
             List<Product> products = new List<Product>();
             int minNumberProducts = 0;
@@ -88,7 +85,7 @@ namespace TasksForJunior
             return products;
         }
 
-        private static Product NewProduct()
+        private Product NewProduct()
         {
             Dictionary<string, int> productsDictionary = new Dictionary<string, int>()
             {
@@ -125,17 +122,30 @@ namespace TasksForJunior
     class Buyer
     {
         private int _money;
-        List<Product> _products = new List<Product>();
+        private List<Product> _products = new List<Product>();
         Random _random = new Random();
         public Buyer(List<Product> products)
         {
-            int minMoney = 3;
+            int minMoney = 8;
             int maxMoney = 15;
             _money = _random.Next(minMoney, maxMoney);
             _products = products;
         }
 
         public int Money { get { return _money; } }
+
+        public int CostAllProducts
+        {
+            get
+            {
+                int totalCost = 0;
+
+                foreach (var product in _products)
+                    totalCost += product.Price;
+
+                return totalCost;
+            }
+        }
 
         public void ShowProduct()
         {
@@ -145,11 +155,11 @@ namespace TasksForJunior
             }
         }
 
-        public bool ThisMadePayment(int sum)
+        public bool CompletedPayment()
         {
-            if (sum <= _money)
+            if (CostAllProducts <= _money)
             {
-                _money -= sum;
+                _money -= CostAllProducts;
                 return true;
             }
             else
@@ -157,8 +167,6 @@ namespace TasksForJunior
                 return false;
             }
         }
-
-        public List<Product> SubmitProductList() => _products;
 
         public void RemoveRandomProduct() => _products.Remove(_products[_random.Next(0, _products.Count)]);
     }
