@@ -8,7 +8,7 @@ namespace TasksForJunior
         static void Main()
         {
             Supermarket supermarket = new Supermarket();
-            supermarket.CalculateClients();
+            supermarket.ServeCustomers();
         }
     }
 
@@ -19,10 +19,10 @@ namespace TasksForJunior
 
         public Supermarket()
         {
-            _buyers = CreateCustomerQueue();
+            _buyers = CreateQueueCustomer();
         }
 
-        public void CalculateClients()
+        public void ServeCustomers()
         {
             int numberBuyer = 1;
 
@@ -33,9 +33,9 @@ namespace TasksForJunior
                 Console.WriteLine($"У {numberBuyer} покупателя {buyer.Money} монет. Он взял товар для покупки:");
                 buyer.ShowProducts();
 
-                if (buyer.ThisMadePayment() == false)
+                if (buyer.ThisMadePayment == false)
                 {
-                    while (buyer.ThisMadePayment() == false)
+                    while (buyer.ThisMadePayment == false)
                     {
                         Console.WriteLine("У покупателя не хватило денег. Он удалил один рандомный товар.");
                         buyer.RemoveRandomProduct();
@@ -44,13 +44,13 @@ namespace TasksForJunior
                     }
                 }
 
-                buyer.PayProducts();
+                buyer.HonorProducts();
                 Console.WriteLine("У покупателя хватило денег на все товары. Он удаляется из очереди.");
                 numberBuyer++;
             }
         }
 
-        private Queue<Buyer> CreateCustomerQueue()
+        private Queue<Buyer> CreateQueueCustomer()
         {
             int minLengthQueue = 3;
             int maxLengthQueue = 5;
@@ -58,12 +58,12 @@ namespace TasksForJunior
             Queue<Buyer> buyers = new Queue<Buyer>();
 
             for (int i = 0; i < lengthQueue; i++)
-                buyers.Enqueue(new Buyer(CreatShoppingList()));
+                buyers.Enqueue(new Buyer(CreateListShopping()));
 
             return buyers;
         }
 
-        private List<Product> CreatShoppingList()
+        private List<Product> CreateListShopping()
         {
             List<Product> initialProductList = new List<Product>
             {
@@ -118,15 +118,15 @@ namespace TasksForJunior
             }
         }
 
+        public bool ThisMadePayment { get { return CostAllProducts <= Money; } }
+
         public void ShowProducts()
         {
             foreach (var product in _products)
                 Console.WriteLine($"{product.Name} стоит {product.Price}");
         }
 
-        public void PayProducts() => Money -= CostAllProducts;
-
-        public bool ThisMadePayment() => CostAllProducts <= Money;
+        public void HonorProducts() => Money -= CostAllProducts;
 
         public void RemoveRandomProduct() => _products.Remove(_products[_random.Next(0, _products.Count)]);
     }
