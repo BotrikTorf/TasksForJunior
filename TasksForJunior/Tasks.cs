@@ -33,18 +33,15 @@ namespace TasksForJunior
                 Console.WriteLine($"У {numberBuyer} покупателя {buyer.Money} монет. Он взял товар для покупки:");
                 buyer.ShowProducts();
 
-                if (buyer.ThisMadePayment == false)
+                while (buyer.CanMadePay == false)
                 {
-                    while (buyer.ThisMadePayment == false)
-                    {
-                        Console.WriteLine("У покупателя не хватило денег. Он удалил один рандомный товар.");
-                        buyer.RemoveRandomProduct();
-                        Console.WriteLine("Остался товар для покупки:");
-                        buyer.ShowProducts();
-                    }
+                    Console.WriteLine("У покупателя не хватило денег. Он удалил один рандомный товар.");
+                    buyer.RemoveRandomProduct();
+                    Console.WriteLine("Остался товар для покупки:");
+                    buyer.ShowProducts();
                 }
 
-                buyer.HonorProducts();
+                buyer.BuyProducts();
                 Console.WriteLine("У покупателя хватило денег на все товары. Он удаляется из очереди.");
                 numberBuyer++;
             }
@@ -84,7 +81,7 @@ namespace TasksForJunior
             int numberProducts = _random.Next(minNumberProducts, maxNumberProducts);
 
             for (int i = 0; i <= numberProducts; i++)
-                products.Add(initialProductList[_random.Next(0,initialProductList.Count)]);
+                products.Add(initialProductList[_random.Next(0, initialProductList.Count)]);
 
             return products;
         }
@@ -118,7 +115,7 @@ namespace TasksForJunior
             }
         }
 
-        public bool ThisMadePayment { get { return CostAllProducts <= Money; } }
+        public bool CanMadePay { get { return CostAllProducts <= Money; } }
 
         public void ShowProducts()
         {
@@ -126,7 +123,7 @@ namespace TasksForJunior
                 Console.WriteLine($"{product.Name} стоит {product.Price}");
         }
 
-        public void HonorProducts() => Money -= CostAllProducts;
+        public void BuyProducts() => Money -= CostAllProducts;
 
         public void RemoveRandomProduct() => _products.Remove(_products[_random.Next(0, _products.Count)]);
     }
