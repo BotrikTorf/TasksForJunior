@@ -51,7 +51,7 @@ namespace TasksForJunior
                 }
             }
 
-            war.ShowSquads();
+            war.ShowStartingUnits();
             war.StartFight();
         }
 
@@ -93,37 +93,32 @@ namespace TasksForJunior
                 _squadFirst = RemovesDeadSoldiers(_squadFirst);
                 _squadSecond = RemovesDeadSoldiers(_squadSecond);
 
-                if (_squadFirst.Count == 0 && _squadSecond.Count != 0)
+                if (_squadFirst.Count == 0 || _squadSecond.Count == 0)
                 {
-                    Console.WriteLine("Выиграл второй отряд!");
-                    Console.WriteLine("В отряде остались бойцы:");
-
-                    foreach (var soldier in _squadSecond)
-                    {
-                        soldier.ShowOption();
-                    }
-                    
                     isFight = false;
                 }
+            }
 
-                if (_squadSecond.Count == 0 && _squadFirst.Count != 0)
-                {
-                    Console.WriteLine("Выиграл первый отряд!");
-                    Console.WriteLine("В отряде остались бойцы:");
+            ShowWinningSquad();
+        }
 
-                    foreach (var soldier in _squadFirst)
-                    {
-                        soldier.ShowOption();
-                    }
-
-                    isFight = false;
-                }
-
-                if (_squadSecond.Count == 0 && _squadFirst.Count == 0)
-                {
-                    Console.WriteLine("Ничья!");
-                    isFight = false;
-                }
+        private void ShowWinningSquad()
+        {
+            if (_squadFirst.Count == 0 && _squadSecond.Count == 0)
+            {
+                Console.WriteLine("Ничья!");
+            }
+            else if (_squadFirst.Count == 0)
+            {
+                Console.WriteLine("Выиграл второй отряд!");
+                Console.WriteLine("В отряде остались бойцы:");
+                ShowSquad(_squadSecond);
+            }
+            else
+            {
+                Console.WriteLine("Выиграл первый отряд!");
+                Console.WriteLine("В отряде остались бойцы:");
+                ShowSquad(_squadFirst);
             }
         }
 
@@ -149,23 +144,14 @@ namespace TasksForJunior
             }
         }
 
-        public void ShowSquads()
+        public void ShowStartingUnits()
         {
             Console.WriteLine();
             Console.WriteLine("В первый отряд завербованы солдаты:");
-
-            foreach (var soldier in _squadFirst)
-            {
-                soldier.ShowOption();
-            }
-
+            ShowSquad(_squadFirst);
             Console.WriteLine();
             Console.WriteLine("Во второй отряд завербованы солдаты:");
-
-            foreach (var soldier in _squadSecond)
-            {
-                soldier.ShowOption();
-            }
+            ShowSquad(_squadSecond);
         }
 
         private List<Soldier> RemovesDeadSoldiers(List<Soldier> listSolders)
@@ -224,6 +210,14 @@ namespace TasksForJunior
 
             return squad;
         }
+
+        private void ShowSquad(List<Soldier> soldiers)
+        {
+            foreach (var soldier in soldiers)
+            {
+                soldier.ShowOption();
+            }
+        }
     }
 
     class Soldier
@@ -271,7 +265,7 @@ namespace TasksForJunior
             Health -= (damage - Armor);
         }
 
-        public bool ThereWasHit(int hitChance)
+        public bool CanHitBullet(int hitChance)
         {
             int minChance = 1;
             int maxChance = 101;
@@ -318,7 +312,7 @@ namespace TasksForJunior
 
                 for (int i = 0; i < soldiers.Count; i++)
                 {
-                    if (ThereWasHit(HitChance))
+                    if (CanHitBullet(HitChance))
                     {
                         soldiers[i].TakeDamage(Damage);
                     }
@@ -344,7 +338,7 @@ namespace TasksForJunior
 
                 base.MakeDamage(soldiers);
 
-                if (ThereWasHit(HitChance))
+                if (CanHitBullet(HitChance))
                 {
                     soldiers[random.Next(0, soldiers.Count)].TakeDamage(Damage);
                 }
