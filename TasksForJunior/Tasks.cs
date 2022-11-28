@@ -90,8 +90,8 @@ namespace TasksForJunior
                     CalculateBattle(ref _squadSecond, ref _squadFirst);
                 }
 
-                _squadFirst = RemovesDeadSoldiers(_squadFirst);
-                _squadSecond = RemovesDeadSoldiers(_squadSecond);
+                RemovesDeadSoldiers(_squadFirst);
+                RemovesDeadSoldiers(_squadSecond);
 
                 if (_squadFirst.Count == 0 || _squadSecond.Count == 0)
                 {
@@ -152,28 +152,20 @@ namespace TasksForJunior
             Console.WriteLine();
             Console.WriteLine("Во второй отряд завербованы солдаты:");
             ShowSquad(_squadSecond);
+            Console.ReadKey();
         }
 
-        private List<Soldier> RemovesDeadSoldiers(List<Soldier> listSolders)
+        private void RemovesDeadSoldiers(List<Soldier> listSolders)
         {
-            List<Soldier> tempListSolders = new List<Soldier>();
-
             for (int i = 0; i < listSolders.Count; i++)
             {
-                if (listSolders[i].Health > 0)
-                {
-                    tempListSolders.Add(listSolders[i]);
-                }
-
                 if (listSolders[i].Health == 0)
                 {
                     Console.WriteLine($"{listSolders[i].Name} - погиб");
+                    listSolders.RemoveAt(i);
                 }
             }
-
-            return tempListSolders;
         }
-
         private List<Soldier> CreatSquad(int size)
         {
             List<Soldier> squad = new List<Soldier>();
@@ -193,19 +185,14 @@ namespace TasksForJunior
                 int index = _random.Next(0, allSoldiers.Count);
                 soldier = allSoldiers[index];
 
-                if (soldier == allSoldiers[0])
-                    soldier = new Sniper();
-
-                if (soldier == allSoldiers[1])
-                    soldier = new MachineGunner();
-
-                if (soldier == allSoldiers[2])
-                    soldier = new Gunner();
-
-                if (soldier == allSoldiers[3])
-                    soldier = new StormTrooper();
-
-                squad.Add(soldier);
+                if (soldier is Sniper)
+                    squad.Add(new Sniper());
+                else if (soldier is MachineGunner)
+                    squad.Add(new MachineGunner());
+                else if (soldier is Gunner)
+                    squad.Add(new Gunner());
+                else if (soldier is StormTrooper)
+                    squad.Add(new StormTrooper());
             }
 
             return squad;
@@ -261,8 +248,8 @@ namespace TasksForJunior
 
         public void TakeDamage(int damage)
         {
-            Console.WriteLine($"Солдат {Name} получил урон {damage - Armor}");
             Health -= (damage - Armor);
+            Console.WriteLine($"Солдат {Name} получил урон {damage - Armor}. У него осталось здоровья : {Health}");
         }
 
         public bool CanHitBullet(int hitChance)
@@ -352,6 +339,8 @@ namespace TasksForJunior
 
         public override void MakeDamage(List<Soldier> soldiers)
         {
+            int numberSoldiersTakingDamage = 3;
+
             if (Health > 0)
             {
                 Random random = new Random();
@@ -359,7 +348,7 @@ namespace TasksForJunior
                 base.MakeDamage(soldiers);
                 int enemyNumber = random.Next(0, soldiers.Count);
 
-                if (soldiers.Count > 3)
+                if (soldiers.Count > numberSoldiersTakingDamage)
                 {
                     soldiers[enemyNumber].TakeDamage(Damage);
 
