@@ -82,12 +82,12 @@ namespace TasksForJunior
                 if (_random.Next(0, numberUnits) == firstSquadNumber)
                 {
                     Console.WriteLine("Бой начинает первый отряд:");
-                    CalculateBattle(ref _squadFirst, ref _squadSecond);
+                    CalculateBattle( _squadFirst, _squadSecond);
                 }
                 else
                 {
                     Console.WriteLine("Бой начинает второй отряд:");
-                    CalculateBattle(ref _squadSecond, ref _squadFirst);
+                    CalculateBattle(_squadSecond, _squadFirst);
                 }
 
                 RemovesDeadSoldiers(_squadFirst);
@@ -122,7 +122,7 @@ namespace TasksForJunior
             }
         }
 
-        private void CalculateBattle(ref List<Soldier> firstSquad, ref List<Soldier> secondSquad)
+        private void CalculateBattle(List<Soldier> firstSquad, List<Soldier> secondSquad)
         {
             int firstDivisionIndex = 0;
             int secondDivisionIndex = 0;
@@ -289,7 +289,7 @@ namespace TasksForJunior
             HitChance = 25;
         }
 
-        int HitChance { get; }
+        public int HitChance { get; }
 
         public override void MakeDamage(List<Soldier> soldiers)
         {
@@ -315,7 +315,7 @@ namespace TasksForJunior
             HitChance = 50;
         }
 
-        int HitChance { get; }
+        public int HitChance { get; }
 
         public override void MakeDamage(List<Soldier> soldiers)
         {
