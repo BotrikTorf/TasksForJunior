@@ -10,23 +10,29 @@ namespace TasksForJunior
             int minSquadSize = 4;
             int maxSquadSize = 20;
 
-            Commander commander = new Commander();
-            Sniper sniper = new Sniper();
-            MachineGunner machineGunner = new MachineGunner();
-            Gunner gunner = new Gunner();
-            StormTrooper stormTrooper = new StormTrooper();
-            War war = null;
+            List<Soldier> soldiers = new List<Soldier>
+            {
+                new Commander(),
+                new Sniper(),
+                new MachineGunner(),
+                new Gunner(),
+                new StormTrooper()
+            };
+            War war = new War();
+            Squad squadFirst = new Squad("1");
+            Squad squadSecond = new Squad("2");
 
             Console.WriteLine("Добро пожаловать в программу МОДЕЛИРОВАНИЕ ВОЙНЫ.\n" +
                 "Будут созданы два отряда с одинаковым количеством войнов.\n" +
                 "В каждом отряде будет свой командир." +
                 $"Размер отрядов: минимальный {minSquadSize}, а максимальный {maxSquadSize}.\n" +
-                "В отряде могут быть:\n" +
-                $"{commander.Name} - наносит урон в одну цель, здоровье среднее.\n" +
-                $"{sniper.Name} - наносит большой урон в одну цель, но обладает малым здоровьем.\n" +
-                $"{machineGunner.Name} - наносит урон всему отряду, велика вероятность промахнуться, здоровье высокое.\n" +
-                $"{gunner.Name} - средний урон в одну цель, но может промахнуться, здоровье среднее.\n" +
-                $"{stormTrooper.Name} - наносит низкий урон цели и двум ближайшим противникам, здоровье высокое.");
+                "В отряде могут быть:");
+
+            foreach (var soldier in soldiers)
+            {
+                soldier.ShowSoldierDescription();
+            }
+
             Console.Write("Введите количество бойцов в отряде: ");
 
             bool haveSquadSelected = true;
@@ -37,7 +43,8 @@ namespace TasksForJunior
                 {
                     if (result >= minSquadSize && result <= maxSquadSize)
                     {
-                        war = new War(result);
+                        squadFirst.CreatSquad(result);
+                        squadSecond.CreatSquad(result);
                         haveSquadSelected = false;
                     }
                     else
@@ -51,26 +58,24 @@ namespace TasksForJunior
                 }
             }
 
-            war.ShowStartingUnits();
-            war.StartFight();
+            squadFirst.ShowSolders();
+            squadSecond.ShowSolders();
+            Console.ReadKey();
+            war.StartFight(squadFirst, squadSecond);
         }
-
     }
 
     class War
     {
-        private List<Soldier> _squadFirst = new List<Soldier>();
-        private List<Soldier> _squadSecond = new List<Soldier>();
         private Random _random = new Random();
+        private Squad _squadFirst;
+        private Squad _squadSecond;
 
-        public War(int size)
+        public void StartFight(Squad squadFirst, Squad squadSecond)
         {
-            _squadFirst = CreatSquad(size);
-            _squadSecond = CreatSquad(size);
-        }
+            _squadFirst = squadFirst;
+            _squadSecond = squadSecond;
 
-        public void StartFight()
-        {
             int firstSquadNumber = 1;
             int numberUnits = 2;
             bool isFight = true;
@@ -82,7 +87,7 @@ namespace TasksForJunior
                 if (_random.Next(0, numberUnits) == firstSquadNumber)
                 {
                     Console.WriteLine("Бой начинает первый отряд:");
-                    CalculateBattle( _squadFirst, _squadSecond);
+                    CalculateBattle(_squadFirst, _squadSecond);
                 }
                 else
                 {
@@ -90,10 +95,10 @@ namespace TasksForJunior
                     CalculateBattle(_squadSecond, _squadFirst);
                 }
 
-                RemovesDeadSoldiers(_squadFirst);
-                RemovesDeadSoldiers(_squadSecond);
+                _squadFirst.RemovesDeadSoldiers();
+                _squadSecond.RemovesDeadSoldiers();
 
-                if (_squadFirst.Count == 0 || _squadSecond.Count == 0)
+                if (_squadFirst.NumberSoldiers == 0 || _squadSecond.NumberSoldiers == 0)
                 {
                     isFight = false;
                 }
@@ -104,104 +109,114 @@ namespace TasksForJunior
 
         private void ShowWinningSquad()
         {
-            if (_squadFirst.Count == 0 && _squadSecond.Count == 0)
+            if (_squadFirst.NumberSoldiers == 0 && _squadSecond.NumberSoldiers == 0)
             {
                 Console.WriteLine("Ничья!");
             }
-            else if (_squadFirst.Count == 0)
+            else if (_squadFirst.NumberSoldiers == 0)
             {
                 Console.WriteLine("Выиграл второй отряд!");
-                Console.WriteLine("В отряде остались бойцы:");
-                ShowSquad(_squadSecond);
+                _squadSecond.ShowSolders();
             }
             else
             {
                 Console.WriteLine("Выиграл первый отряд!");
-                Console.WriteLine("В отряде остались бойцы:");
-                ShowSquad(_squadFirst);
+                _squadFirst.ShowSolders();
             }
         }
 
-        private void CalculateBattle(List<Soldier> firstSquad, List<Soldier> secondSquad)
+        private void CalculateBattle(Squad firstSquad, Squad secondSquad)
         {
             int firstDivisionIndex = 0;
             int secondDivisionIndex = 0;
 
-            while (firstDivisionIndex < firstSquad.Count && secondDivisionIndex < secondSquad.Count)
+            while (firstDivisionIndex < firstSquad.NumberSoldiers && secondDivisionIndex < secondSquad.NumberSoldiers)
             {
-                if (firstDivisionIndex < firstSquad.Count)
+                if (firstDivisionIndex < firstSquad.NumberSoldiers)
                 {
-                    firstSquad[firstDivisionIndex].MakeDamage(secondSquad);
+                    firstSquad.JoinFight(secondSquad.Soldiers, firstDivisionIndex);
                 }
 
-                if (secondDivisionIndex < secondSquad.Count)
+                if (secondDivisionIndex < secondSquad.NumberSoldiers)
                 {
-                    secondSquad[secondDivisionIndex].MakeDamage(firstSquad);
+                    secondSquad.JoinFight(firstSquad.Soldiers, secondDivisionIndex);
                 }
 
                 firstDivisionIndex++;
                 secondDivisionIndex++;
             }
         }
+    }
 
-        public void ShowStartingUnits()
+    class Squad
+    {
+        private List<Soldier> _soldiers;
+        private string _number;
+        public Squad(string number)
         {
-            Console.WriteLine();
-            Console.WriteLine("В первый отряд завербованы солдаты:");
-            ShowSquad(_squadFirst);
-            Console.WriteLine();
-            Console.WriteLine("Во второй отряд завербованы солдаты:");
-            ShowSquad(_squadSecond);
-            Console.ReadKey();
+            _number = number;
+            _soldiers = new List<Soldier> { new Commander() };
         }
 
-        private void RemovesDeadSoldiers(List<Soldier> listSolders)
+        public int NumberSoldiers { get { return _soldiers.Count; } }
+
+        public List<Soldier> Soldiers { get { return _soldiers; } }
+
+        public void CreatSquad(int size)
         {
-            for (int i = 0; i < listSolders.Count; i++)
-            {
-                if (listSolders[i].Health == 0)
-                {
-                    Console.WriteLine($"{listSolders[i].Name} - погиб");
-                    listSolders.RemoveAt(i);
-                }
-            }
-        }
-        private List<Soldier> CreatSquad(int size)
-        {
-            List<Soldier> squad = new List<Soldier>();
-            List<Soldier> allSoldiers = new List<Soldier>
-            {
-                { new Sniper() },
-                { new MachineGunner() },
-                { new Gunner() },
-                { new StormTrooper() },
-            };
-            Commander commander = new Commander();
-            squad.Add(commander);
+            Random random = new Random();
 
             for (int i = 1; i < size; i++)
             {
-                Soldier soldier;
-                int index = _random.Next(0, allSoldiers.Count);
-                soldier = allSoldiers[index];
+                List<Soldier> allSoldiers = new List<Soldier>
+                {
+                    { new Sniper() },
+                    { new MachineGunner() },
+                    { new Gunner() },
+                    { new StormTrooper() },
+                };
 
-                if (soldier is Sniper)
-                    squad.Add(new Sniper());
-                else if (soldier is MachineGunner)
-                    squad.Add(new MachineGunner());
-                else if (soldier is Gunner)
-                    squad.Add(new Gunner());
-                else if (soldier is StormTrooper)
-                    squad.Add(new StormTrooper());
+                int index = random.Next(0, allSoldiers.Count);
+                _soldiers.Add(allSoldiers[index]);
             }
-
-            return squad;
         }
 
-        private void ShowSquad(List<Soldier> soldiers)
+        public void JoinFight(List<Soldier> soldiers, int index)
         {
-            foreach (var soldier in soldiers)
+            Console.Write($"{_number}. ");
+            _soldiers[index].MakeDamage(soldiers);
+        }
+
+        public void RemovesDeadSoldiers()
+        {
+            int index = 0;
+
+            while (index < _soldiers.Count)
             {
+                if (_soldiers[index].Health == 0)
+                {
+                    Console.WriteLine($"Солдат {_number} отряда: {_soldiers[index].Name} - погиб");
+                    _soldiers.RemoveAt(index);
+                }
+                else
+                {
+                    index++;
+                }
+            }
+        }
+
+        public void ShowSolders()
+        {
+            Console.WriteLine($"В отряде номер {_number} служат солдаты:");
+            ShowSquad();
+            Console.WriteLine();
+        }
+
+        private void ShowSquad()
+        {
+            foreach (var soldier in _soldiers)
+            {
+                Console.Write(_number + ". ");
                 soldier.ShowOption();
             }
         }
@@ -246,6 +261,8 @@ namespace TasksForJunior
             Console.WriteLine($"Солдат {Name} наносит урон");
         }
 
+        public virtual void ShowSoldierDescription() { }
+
         public void TakeDamage(int damage)
         {
             Health -= (damage - Armor);
@@ -280,6 +297,11 @@ namespace TasksForJunior
                 soldiers[random.Next(0, soldiers.Count)].TakeDamage(Damage);
             }
         }
+
+        public override void ShowSoldierDescription()
+        {
+            Console.WriteLine($"{Name} - наносит большой урон в одну цель, но обладает малым здоровьем.");
+        }
     }
 
     class MachineGunner : Soldier
@@ -306,6 +328,11 @@ namespace TasksForJunior
                 }
             }
         }
+
+        public override void ShowSoldierDescription()
+        {
+            Console.WriteLine($"{Name} - наносит урон всему отряду, велика вероятность промахнуться, здоровье высокое.");
+        }
     }
 
     class Gunner : Soldier
@@ -331,6 +358,11 @@ namespace TasksForJunior
                 }
             }
         }
+
+        public override void ShowSoldierDescription()
+        {
+            Console.WriteLine($"{Name} - средний урон в одну цель, но может промахнуться, здоровье среднее.");
+        }
     }
 
     class StormTrooper : Soldier
@@ -340,44 +372,53 @@ namespace TasksForJunior
         public override void MakeDamage(List<Soldier> soldiers)
         {
             int numberSoldiersTakingDamage = 3;
+            Random random = new Random();
 
             if (Health > 0)
             {
-                Random random = new Random();
-
-                base.MakeDamage(soldiers);
+                int[] index = new int[numberSoldiersTakingDamage];
                 int enemyNumber = random.Next(0, soldiers.Count);
 
-                if (soldiers.Count > numberSoldiersTakingDamage)
+                base.MakeDamage(soldiers);
+
+                if (soldiers.Count <= numberSoldiersTakingDamage)
                 {
-                    soldiers[enemyNumber].TakeDamage(Damage);
+                    index = new int[soldiers.Count];
 
-                    if (enemyNumber == 0)
+                    for (int i = 0; i < soldiers.Count; i++)
                     {
-                        soldiers[soldiers.Count - 1].TakeDamage(Damage);
-                        soldiers[enemyNumber + 1].TakeDamage(Damage);
+                        index[i] = i;
                     }
-
-                    if (enemyNumber == soldiers.Count - 1)
-                    {
-                        soldiers[0].TakeDamage(Damage);
-                        soldiers[enemyNumber - 1].TakeDamage(Damage);
-                    }
-
-                    if (enemyNumber > 0 && enemyNumber < soldiers.Count - 1)
-                    {
-                        soldiers[enemyNumber + 1].TakeDamage(Damage);
-                        soldiers[enemyNumber - 1].TakeDamage(Damage);
-                    }
+                }
+                else if (enemyNumber > 0 && enemyNumber < soldiers.Count - 1)
+                {
+                    index[0] = enemyNumber;
+                    index[1] = enemyNumber - 1;
+                    index[2] = enemyNumber + 1;
+                }
+                else if (enemyNumber == 0)
+                {
+                    index[0] = enemyNumber;
+                    index[1] = soldiers.Count - 1;
+                    index[2] = enemyNumber + 1;
                 }
                 else
                 {
-                    for (int i = 0; i < soldiers.Count; i++)
-                    {
-                        soldiers[i].TakeDamage(Damage);
-                    }
+                    index[0] = enemyNumber;
+                    index[1] = enemyNumber - 1;
+                    index[2] = 0;
+                }
+
+                for (int i = 0; i < index.Length; i++)
+                {
+                    soldiers[index[i]].TakeDamage(Damage);
                 }
             }
+        }
+
+        public override void ShowSoldierDescription()
+        {
+            Console.WriteLine($"{Name} - наносит низкий урон цели и двум ближайшим противникам, здоровье высокое.");
         }
     }
 
@@ -394,6 +435,11 @@ namespace TasksForJunior
                 base.MakeDamage(soldiers);
                 soldiers[random.Next(0, soldiers.Count)].TakeDamage(Damage);
             }
+        }
+
+        public override void ShowSoldierDescription()
+        {
+            Console.WriteLine($"{Name} - наносит урон в одну цель, здоровье среднее.");
         }
     }
 }
