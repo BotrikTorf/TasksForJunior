@@ -134,14 +134,14 @@ namespace TasksForJunior
             {
                 if (firstDivisionIndex < firstSquad.NumberSoldiers)
                 {
-                    Soldier soldier = secondSquad.AttackSoldier(secondDivisionIndex);
+                    Soldier soldier = secondSquad.GetSoldier(secondDivisionIndex);
 
                     firstSquad.TakeDamege(soldier.MakeDamage(firstSquad.NumberSoldiers), soldier.Damage);
                 }
 
                 if (secondDivisionIndex < secondSquad.NumberSoldiers)
                 {
-                    Soldier soldier = firstSquad.AttackSoldier(firstDivisionIndex);
+                    Soldier soldier = firstSquad.GetSoldier(firstDivisionIndex);
 
                     secondSquad.TakeDamege(soldier.MakeDamage(secondSquad.NumberSoldiers), soldier.Damage);
                 }
@@ -181,10 +181,9 @@ namespace TasksForJunior
                     _soldiers[index[i]].TakeDamage(damage);
                 }
             }
-
         }
 
-        public Soldier AttackSoldier(int index)
+        public Soldier GetSoldier(int index)
         {
             return _soldiers[index];
         }
