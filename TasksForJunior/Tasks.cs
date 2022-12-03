@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace TasksForJunior
 {
     class Tasks
@@ -137,7 +136,7 @@ namespace TasksForJunior
 
         public void RemoveDeadFish()
         {
-            bool haveDeadFifh = SearchDeadFish();
+            bool haveDeadFifh = IsFoundDeadFish();
 
             if (haveDeadFifh)
             {
@@ -251,7 +250,7 @@ namespace TasksForJunior
             return age;
         }
 
-        private bool SearchDeadFish()
+        private bool IsFoundDeadFish()
         {
             bool haveDeadFifh = false;
 
