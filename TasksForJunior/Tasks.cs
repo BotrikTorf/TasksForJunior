@@ -9,15 +9,15 @@ namespace TasksForJunior
         {
             Aquarium aquarium = new Aquarium();
             bool isAquariumExists = true;
-            string ansver = "y";
+            string commandAnsver = "y";
 
-            aquarium.ShowFish();
+            aquarium.ShowFishes();
 
             while (isAquariumExists)
             {
-                Console.Write($"Если вы хотите добавить рыбку, то введите \"{ansver}\": ");
+                Console.Write($"Если вы хотите добавить рыбку, то введите \"{commandAnsver}\": ");
 
-                if (Console.ReadLine().ToLower() == ansver)
+                if (Console.ReadLine().ToLower() == commandAnsver)
                 {
                     bool canKeepCreating = true;
 
@@ -25,9 +25,9 @@ namespace TasksForJunior
                     {
                         aquarium.AddFish();
 
-                        Console.WriteLine($"Если вы хотите продолжить заселять аквариум, то введите \"{ansver}\": ");
+                        Console.WriteLine($"Если вы хотите продолжить заселять аквариум, то введите \"{commandAnsver}\": ");
 
-                        if (Console.ReadLine().ToLower() != ansver)
+                        if (Console.ReadLine().ToLower() != commandAnsver)
                             canKeepCreating = false;
                     }
                 }
@@ -36,13 +36,13 @@ namespace TasksForJunior
                     Console.WriteLine();
                 }
 
-                aquarium.ShowFish();
+                aquarium.ShowFishes();
                 aquarium.RemoveFish();
                 Console.WriteLine();
                 aquarium.RemoveDeadFish();
-                Console.Write($"Если вы хотите выйте из аквариума то введите \"{ansver}\": ");
+                Console.Write($"Если вы хотите выйте из аквариума то введите \"{commandAnsver}\": ");
 
-                if (Console.ReadLine().ToLower() == ansver)
+                if (Console.ReadLine().ToLower() == commandAnsver)
                     isAquariumExists = false;
 
                 aquarium.LiveOneYear();
@@ -52,17 +52,17 @@ namespace TasksForJunior
 
     class Aquarium
     {
-        private int _maxFish = 20;
-        private List<Fish> _fishs;
+        private int _maxFishes = 20;
+        private List<Fish> _fishes;
 
         public Aquarium()
         {
-            _fishs = new List<Fish>();
+            _fishes = new List<Fish>();
         }
 
         public void AddFish()
         {
-            List<Fish> fishsList = new List<Fish>
+            List<Fish> fishesList = new List<Fish>
             {
                 new Neon(),
                 new Guppy(),
@@ -70,29 +70,29 @@ namespace TasksForJunior
                 new Barbus()
             };
 
-            Console.WriteLine($" В аквариуме может плавать не более {_maxFish} рыбок, сейчас в аквариуме {_fishs.Count} рыбок.");
+            Console.WriteLine($" В аквариуме может плавать не более {_maxFishes} рыбок, сейчас в аквариуме {_fishes.Count} рыбок.");
 
-            if (_fishs.Count < _maxFish)
+            if (_fishes.Count < _maxFishes)
             {
                 Console.WriteLine("Выберите рыбу которую хотите добавить(введите номер из списка):");
                 int numberFish = 0;
 
-                foreach (var fish in fishsList)
+                foreach (var fish in fishesList)
                 {
                     Console.WriteLine($"{numberFish}. {fish.Name}");
                     numberFish++;
                 }
 
-                numberFish = ChooseNumberFish(fishsList.Count);
+                numberFish = ChooseNumberFish(fishesList.Count);
 
-                if (fishsList[numberFish] is Neon)
-                    _fishs.Add(new Neon(ChangeAge(fishsList[numberFish])));
-                else if (fishsList[numberFish] is Guppy)
-                    _fishs.Add(new Guppy(ChangeAge(fishsList[numberFish])));
-                else if (fishsList[numberFish] is Angel)
-                    _fishs.Add(new Angel(ChangeAge(fishsList[numberFish])));
+                if (fishesList[numberFish] is Neon)
+                    _fishes.Add(new Neon(ChangeAge(fishesList[numberFish])));
+                else if (fishesList[numberFish] is Guppy)
+                    _fishes.Add(new Guppy(ChangeAge(fishesList[numberFish])));
+                else if (fishesList[numberFish] is Angel)
+                    _fishes.Add(new Angel(ChangeAge(fishesList[numberFish])));
                 else
-                    _fishs.Add(new Barbus(ChangeAge(fishsList[numberFish])));
+                    _fishes.Add(new Barbus(ChangeAge(fishesList[numberFish])));
             }
             else
             {
@@ -102,11 +102,11 @@ namespace TasksForJunior
 
         public void RemoveFish()
         {
-            string ansver = "y";
+            string commandAnsver = "y";
 
-            Console.Write($"Если вы хотите удалить рыбку, то нажмите {ansver}: ");
+            Console.Write($"Если вы хотите удалить рыбку, то нажмите {commandAnsver}: ");
 
-            if (Console.ReadLine().ToLower() == ansver)
+            if (Console.ReadLine().ToLower() == commandAnsver)
             {
                 Console.Write("Введите номер рыбки которую вы хотите удалить: ");
 
@@ -116,10 +116,10 @@ namespace TasksForJunior
                 {
                     if (int.TryParse(Console.ReadLine(), out int result))
                     {
-                        if (result < _fishs.Count && result >= 0)
+                        if (result < _fishes.Count && result >= 0)
                         {
                             isNumberCorrect = true;
-                            _fishs.RemoveAt(result);
+                            _fishes.RemoveAt(result);
                         }
                         else
                         {
@@ -144,18 +144,18 @@ namespace TasksForJunior
 
                 int index = 0;
 
-                while (index < _fishs.Count)
+                while (index < _fishes.Count)
                 {
-                    if (_fishs[index].MaxAge <= _fishs[index].Age)
+                    if (_fishes[index].MaxAge <= _fishes[index].Age)
                     {
-                        _fishs[index].ShowFeatures();
+                        _fishes[index].ShowFeatures();
 
                         string ansver = "y";
 
                         Console.Write($"Данная рыбка мертва. Для удаления введите {ansver}: ");
 
                         if (Console.ReadLine().ToLower() == ansver)
-                            _fishs.RemoveAt(index);
+                            _fishes.RemoveAt(index);
                         else
                             Console.WriteLine("Мертвая рыба осталась плавать в аквариуме!");
                     }
@@ -167,13 +167,13 @@ namespace TasksForJunior
 
         public void LiveOneYear()
         {
-            foreach (var fish in _fishs)
+            foreach (var fish in _fishes)
                 fish.IncreasesAge();
         }
 
-        public void ShowFish()
+        public void ShowFishes()
         {
-            if (_fishs.Count == 0)
+            if (_fishes.Count == 0)
             {
                 Console.WriteLine("В аквариуме нет рыб!");
             }
@@ -181,7 +181,7 @@ namespace TasksForJunior
             {
                 int number = 0;
 
-                foreach (var fish in _fishs)
+                foreach (var fish in _fishes)
                 {
                     Console.Write($"{number}. ");
                     fish.ShowFeatures();
@@ -254,7 +254,7 @@ namespace TasksForJunior
         {
             bool haveDeadFifh = false;
 
-            foreach (var fish in _fishs)
+            foreach (var fish in _fishes)
                 if (fish.MaxAge <= fish.Age)
                     haveDeadFifh = true;
 
