@@ -83,16 +83,9 @@ namespace TasksForJunior
                     numberFish++;
                 }
 
-                numberFish = ChooseNumberFish(fishesList.Count);
+                numberFish = ReadInt(fishesList.Count);
 
-                if (fishesList[numberFish] is Neon)
-                    _fishes.Add(new Neon(ChangeAge(fishesList[numberFish])));
-                else if (fishesList[numberFish] is Guppy)
-                    _fishes.Add(new Guppy(ChangeAge(fishesList[numberFish])));
-                else if (fishesList[numberFish] is Angel)
-                    _fishes.Add(new Angel(ChangeAge(fishesList[numberFish])));
-                else
-                    _fishes.Add(new Barbus(ChangeAge(fishesList[numberFish])));
+                _fishes.Add(fishesList[numberFish]);
             }
             else
             {
@@ -109,28 +102,7 @@ namespace TasksForJunior
             if (Console.ReadLine().ToLower() == commandAnsver)
             {
                 Console.Write("Введите номер рыбки которую вы хотите удалить: ");
-
-                bool isNumberCorrect = false;
-
-                while (isNumberCorrect == false)
-                {
-                    if (int.TryParse(Console.ReadLine(), out int result))
-                    {
-                        if (result < _fishes.Count && result >= 0)
-                        {
-                            isNumberCorrect = true;
-                            _fishes.RemoveAt(result);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Вы ввели не правельно число, попробуйте еще раз");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Вы не ввели число, попробуйте еще раз");
-                    }
-                }
+                _fishes.RemoveAt(ReadInt(_fishes.Count));
             }
         }
 
@@ -190,7 +162,7 @@ namespace TasksForJunior
             }
         }
 
-        private int ChooseNumberFish(int count)
+        private int ReadInt(int count)
         {
             bool isChangeNumber = false;
             int number = 0;
@@ -218,38 +190,6 @@ namespace TasksForJunior
             return number;
         }
 
-        private float ChangeAge(Fish fish)
-        {
-            bool isChangeAge = false;
-            int minAge = 0;
-            float age = 0f;
-
-            Console.Write("Укажите возраст рыбки которую вы хотите добавить в аквариум, " +
-                             $"ее возраст не дожен привышать {fish.MaxAge} лет: ");
-
-            while (isChangeAge == false)
-            {
-                if (float.TryParse(Console.ReadLine(), out float result))
-                {
-                    if (result <= fish.MaxAge && result >= minAge)
-                    {
-                        isChangeAge = true;
-                        age = result;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Вы ввели не правельно число");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Вы не ввели число, попробуйте еще раз");
-                }
-            }
-
-            return age;
-        }
-
         private bool IsFoundDeadFish()
         {
             bool haveDeadFifh = false;
@@ -269,13 +209,6 @@ namespace TasksForJunior
             MaxAge = maxAge;
             Name = name;
             Age = 0;
-        }
-
-        public Fish(float age, int maxAge, string name = null)
-        {
-            MaxAge = maxAge;
-            Name = name;
-            Age = age;
         }
 
         public string Name { get; }
@@ -302,28 +235,20 @@ namespace TasksForJunior
     class Neon : Fish
     {
         public Neon() : base(5, "Neon") { }
-
-        public Neon(float age) : base(age, 5, "Neon") { }
     }
 
     class Guppy : Fish
     {
         public Guppy() : base(4, "Guppy") { }
-
-        public Guppy(float age) : base(age, 4, "Guppy") { }
     }
 
     class Angel : Fish
     {
         public Angel() : base(10, "Angel") { }
-
-        public Angel(float age) : base(age, 10, "Angel") { }
     }
 
     class Barbus : Fish
     {
         public Barbus() : base(4, "Barbus") { }
-
-        public Barbus(float age) : base(age, 4, "Barbus") { }
     }
 }
