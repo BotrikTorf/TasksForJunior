@@ -22,158 +22,140 @@ namespace TasksForJunior
             Create();
         }
 
-        private void Create()
-        {
-            _aviaries.Add(new Aviary("Wolf"));
-            _aviaries.Add(new Aviary("Lynx"));
-            _aviaries.Add(new Aviary("Elephant"));
-            _aviaries.Add(new Aviary("Sheep"));
-        }
-
         public void Start()
         {
-            bool isZooOpen = true;
-            string exit = "e";
+            bool isOpen = true;
+            string commandExit = "e";
+            string enteredString;
 
             Console.Write("Добро пожаловать в маленький зоопарк.\n" +
                 $"В зоопарке есть {_aviaries.Count} вальера. " +
                 $"Введите номер вальера к которому хотите подойти(от 0 до {_aviaries.Count - 1}): ");
 
-            while (isZooOpen)
+            while (isOpen)
             {
-                ChooseAviary(Console.ReadLine());
+                enteredString = Console.ReadLine();
+                ChooseAviary(enteredString);
+
+                if (enteredString == commandExit)
+                    isOpen = false;
+
                 Console.WriteLine("Если хотите посетить другой вальер введите номер вальера, " +
-                    $"а если хотите выйти из зоопарка введите {exit} :");
-
-                string enteredString = Console.ReadLine();
-
-                if (enteredString == exit)
-                    isZooOpen = false;
-                else
-                    ChooseAviary(enteredString);
+                 $"а если хотите выйти из зоопарка введите {commandExit} :");
             }
+        }
+
+        private void Create()
+        {
+            _aviaries.Add(new Aviary(new Wolf()));
+            _aviaries.Add(new Aviary(new Lynx()));
+            _aviaries.Add(new Aviary(new Elephant()));
+            _aviaries.Add(new Aviary(new Sheep()));
         }
 
         private void ChooseAviary(string enteredString)
         {
-            bool haveChooseAviary = true;
-
-            while (haveChooseAviary)
+            if (int.TryParse(enteredString, out int result))
             {
-                if (int.TryParse(enteredString, out int result))
+                if (result < _aviaries.Count && result >= 0)
                 {
-                    if (result < _aviaries.Count && result >= 0)
-                    {
-                        _aviaries[result].Show();
-                        haveChooseAviary = false;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Вы ввели не правельно число, попробуйте еще раз");
-                        enteredString = Console.ReadLine();
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Вы не ввели число, попробуйте еще раз");
-                    enteredString = Console.ReadLine();
+                    _aviaries[result].Show();
                 }
             }
         }
-    }
-
-    class Aviary
-    {
-        List<Animal> _animals;
-
-        public Aviary(string name)
-        {
-            _animals = new List<Animal>();
-            Create(name);
-        }
-
-        public void Show()
-        {
-            foreach (var animal in _animals)
-            {
-                animal.Show();
-            }
-        }
-
-        private void Create(string name)
-        {
-            if (name == "Wolf")
-            {
-                _animals.Add(new Wolf("Adult", "Male"));
-                _animals.Add(new Wolf("Adult", "Female"));
-                _animals.Add(new Wolf("Joey", "Female"));
-                _animals.Add(new Wolf("Joey", "Male"));
-            }
-            else if (name == "Lynx")
-            {
-                _animals.Add(new Lynx("Adult", "Male"));
-                _animals.Add(new Lynx("Adult", "Female"));
-                _animals.Add(new Lynx("Joey", "Female"));
-                _animals.Add(new Lynx("Joey", "Female"));
-                _animals.Add(new Lynx("Joey", "Male"));
-            }
-            else if (name == "Elephant")
-            {
-                _animals.Add(new Elephant("Adult", "Male"));
-                _animals.Add(new Elephant("Adult", "Female"));
-                _animals.Add(new Elephant("Joey", "Female"));
-            }
-            else
-            {
-                _animals.Add(new Sheep("Adult", "Male"));
-                _animals.Add(new Sheep("Adult", "Female"));
-                _animals.Add(new Sheep("Joey", "Female"));
-                _animals.Add(new Sheep("Joey", "Male"));
-            }
-        }
-    }
-
-    class Animal
-    {
-        public Animal(string age, string gender, string name, string sound)
-        {
-            Age = age;
-            Gender = gender;
-            Name = name;
-            Sound = sound;
-        }
-
-        public string Age { get; }
-
-        public string Gender { get; }
-
-        public string Name { get; }
-
-        public string Sound { get; }
-
-        public void Show()
-        {
-            Console.WriteLine($"{Age} {Name} {Gender} пола и издает звук {Sound}.");
-        }
-    }
-
-    class Wolf : Animal
-    {
-        public Wolf(string age, string gender) : base(age, gender, "Wolf", "U-U-U") { }
-    }
-
-    class Lynx : Animal
-    {
-        public Lynx(string age, string gender) : base(age, gender, "Lynx", "VOU-VOU-VOU") { }
-    }
-
-    class Elephant : Animal
-    {
-        public Elephant(string age, string gender) : base(age, gender, "Elephant", "BUUU-BUUU-BUUU") { }
-    }
-
-    class Sheep : Animal
-    {
-        public Sheep(string age, string gender) : base(age, gender, "Sheep", "BEE-BEE-BEE") { }
     }
 }
+
+class Aviary
+{
+    List<Animal> _animals;
+
+    public Aviary(Animal animal)
+    {
+        _animals = new List<Animal>();
+        Create(animal);
+    }
+
+    public void Show()
+    {
+        foreach (var animal in _animals)
+        {
+            animal.Show();
+        }
+    }
+
+    private void Create(Animal animal)
+    {
+        _animals.Add(new Animal("Adult", "Male", animal.Name, animal.Sound));
+        _animals.Add(new Animal("Adult", "Female", animal.Name, animal.Sound));
+        _animals.Add(new Animal("Joey", "Female", animal.Name, animal.Sound));
+        _animals.Add(new Animal("Joey", "Male", animal.Name, animal.Sound));
+    }
+}
+
+class Animal
+{
+    public Animal()
+    {
+        Age = null;
+        Gender = null;
+    }
+
+    public Animal(string age, string gender, string name, string sound)
+    {
+        Age = age;
+        Gender = gender;
+        Name = name;
+        Sound = sound;
+    }
+
+    public string Age { get; }
+
+    public string Gender { get; }
+
+    public string Name { get; private protected set; }
+
+    public string Sound { get; private protected set; }
+
+    public void Show()
+    {
+        Console.WriteLine($"{Age} {Name} {Gender} пола и издает звук {Sound}.");
+    }
+}
+
+class Wolf : Animal
+{
+    public Wolf()
+    {
+        base.Name = "Wolf";
+        base.Sound = "U-U-U";
+    }
+}
+
+class Lynx : Animal
+{
+    public Lynx()
+    {
+        base.Name = "Lynx";
+        base.Sound = "VOU-VOU-VOU";
+    }
+}
+
+class Elephant : Animal
+{
+    public Elephant()
+    {
+        base.Name = "Elephant";
+        base.Sound = "BUUU-BUUU-BUUU";
+    }
+}
+
+class Sheep : Animal
+{
+    public Sheep()
+    {
+        base.Name = "Sheep";
+        base.Sound = "BEE-BEE-BEE";
+    }
+}
+
