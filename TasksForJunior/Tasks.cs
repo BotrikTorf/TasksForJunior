@@ -127,8 +127,8 @@ class Wolf : Animal
 {
     public Wolf()
     {
-        base.Name = "Wolf";
-        base.Sound = "U-U-U";
+        Name = "Wolf";
+        Sound = "U-U-U";
     }
 }
 
@@ -136,8 +136,8 @@ class Lynx : Animal
 {
     public Lynx()
     {
-        base.Name = "Lynx";
-        base.Sound = "VOU-VOU-VOU";
+        Name = "Lynx";
+        Sound = "VOU-VOU-VOU";
     }
 }
 
@@ -145,8 +145,8 @@ class Elephant : Animal
 {
     public Elephant()
     {
-        base.Name = "Elephant";
-        base.Sound = "BUUU-BUUU-BUUU";
+        Name = "Elephant";
+        Sound = "BUUU-BUUU-BUUU";
     }
 }
 
@@ -154,8 +154,7 @@ class Sheep : Animal
 {
     public Sheep()
     {
-        base.Name = "Sheep";
-        base.Sound = "BEE-BEE-BEE";
+        Name = "Sheep";
+        Sound = "BEE-BEE-BEE";
     }
 }
-
