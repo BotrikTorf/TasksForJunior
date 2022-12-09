@@ -67,11 +67,11 @@ namespace TasksForJunior
 
     class Stock
     {
-        private List<Container> _products;
+        private List<Container> _containers;
 
         public Stock()
         {
-            _products = new List<Container>();
+            _containers = new List<Container>();
             Create();
         }
 
@@ -79,12 +79,12 @@ namespace TasksForJunior
         {
             Part getPart = new Part();
 
-            foreach (var product in _products)
+            foreach (var container in _containers)
             {
-                if (product.Name == name && product.Amount > 0)
+                if (container.Name == name && container.Amount > 0)
                 {
-                    getPart = product.Part;
-                    product.ReduceNumberParts();
+                    getPart = container.Part;
+                    container.ReduceNumberParts();
                     Console.WriteLine("Деталь имеется.");
                 }
             }
@@ -99,12 +99,12 @@ namespace TasksForJunior
 
         private void Create()
         {
-            _products.Add(new Container(new Part(100, "engine"), 3));
-            _products.Add(new Container(new Part(10, "sleeve"), 2));
-            _products.Add(new Container(new Part(20, "lever"), 5));
-            _products.Add(new Container(new Part(50, "brake pads"), 3));
-            _products.Add(new Container(new Part(40, "tyre"), 3));
-            _products.Add(new Container(new Part(5, "wipers"), 5));
+            _containers.Add(new Container(new Part(100, "engine"), 3));
+            _containers.Add(new Container(new Part(10, "sleeve"), 2));
+            _containers.Add(new Container(new Part(20, "lever"), 5));
+            _containers.Add(new Container(new Part(50, "brake pads"), 3));
+            _containers.Add(new Container(new Part(40, "tyre"), 3));
+            _containers.Add(new Container(new Part(5, "wipers"), 5));
         }
     }
 
