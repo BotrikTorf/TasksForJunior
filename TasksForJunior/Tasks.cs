@@ -67,11 +67,11 @@ namespace TasksForJunior
 
     class Stock
     {
-        private List<Product> _products;
+        private List<Container> _products;
 
         public Stock()
         {
-            _products = new List<Product>();
+            _products = new List<Container>();
             Create();
         }
 
@@ -84,7 +84,7 @@ namespace TasksForJunior
                 if (product.Name == name && product.Amount > 0)
                 {
                     getPart = product.Part;
-                    product.ChangeQuantity();
+                    product.ReduceNumberParts();
                     Console.WriteLine("Деталь имеется.");
                 }
             }
@@ -99,18 +99,18 @@ namespace TasksForJunior
 
         private void Create()
         {
-            _products.Add(new Product(new Part(100, "engine"), 3));
-            _products.Add(new Product(new Part(10, "sleeve"), 2));
-            _products.Add(new Product(new Part(20, "lever"), 5));
-            _products.Add(new Product(new Part(50, "brake pads"), 3));
-            _products.Add(new Product(new Part(40, "tyre"), 3));
-            _products.Add(new Product(new Part(5, "wipers"), 5));
+            _products.Add(new Container(new Part(100, "engine"), 3));
+            _products.Add(new Container(new Part(10, "sleeve"), 2));
+            _products.Add(new Container(new Part(20, "lever"), 5));
+            _products.Add(new Container(new Part(50, "brake pads"), 3));
+            _products.Add(new Container(new Part(40, "tyre"), 3));
+            _products.Add(new Container(new Part(5, "wipers"), 5));
         }
     }
 
-    class Product
+    class Container
     {
-        public Product(Part part, int amount)
+        public Container(Part part, int amount)
         {
             Part = part;
             Amount = amount;
@@ -128,7 +128,7 @@ namespace TasksForJunior
 
         public int Amount { get; private set; }
 
-        public void ChangeQuantity()
+        public void ReduceNumberParts()
         {
             Amount--;
         }
