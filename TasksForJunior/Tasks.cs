@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TasksForJunior
 {
@@ -9,13 +8,13 @@ namespace TasksForJunior
         static void Main()
         {
             CarService carService = new CarService();
-            carService.Servis(new Car("engine", 100f));
-            carService.Servis(new Car("sleeve", 20f));
-            carService.Servis(new Car("sleeve", 10f));
-            carService.Servis(new Car("sleeve", 150f));
-            carService.Servis(new Car("wipers", 100f));
-            carService.Servis(new Car("tyre", 100f));
-            carService.Servis(new Car("cardan shaft", 100f));
+            carService.ServiceCar(new Car("engine", 100f));
+            carService.ServiceCar(new Car("sleeve", 20f));
+            carService.ServiceCar(new Car("sleeve", 10f));
+            carService.ServiceCar(new Car("sleeve", 150f));
+            carService.ServiceCar(new Car("wipers", 100f));
+            carService.ServiceCar(new Car("tyre", 100f));
+            carService.ServiceCar(new Car("cardan shaft", 100f));
         }
     }
 
@@ -30,35 +29,33 @@ namespace TasksForJunior
             _stock = new Stock();
         }
 
-        public void Servis(Car car)
+        public void ServiceCar(Car car)
         {
-            Part part = new Part(); 
             Console.WriteLine("Добро пожаловать в автосервис!\n" +
                 $"Вам требуется заменить деталь {car.NamePart}.\n" +
-                "Проверим есть ли такая деталь на складе: ");
-            part = _stock.GetPart(car.NamePart);
+                "Проверим есть ли такая запчасть на складе: ");
 
-            if (part.Name == null)
+            if (_stock.HaveSparePart(car.NamePart))
             {
-                if (_money >= part.CostWork)
-                {
-                    Console.WriteLine("Приносим свои извинения но такой детали нет на складе. " +
-                                      $"Вам будет выплачена сумма равная: {part.CostWork}");
-                    car.GetMoney(part.CostWork);
-                    _money -= part.CostWork;
-                }
-                else
-                {
-                    Console.WriteLine("Извините но в автосервисе нет денег чтобы вам выплатить неустойку");
-                }
-            }
-            else
-            {
+                Part part = _stock.GetPart(car.NamePart);
+                float serviceCost = part.CostWork + part.Price;
+
                 Console.WriteLine($"Была заменена деталь: {part.Name}.\n" +
                                   $"Стоимость детали: {part.Price}.\n" +
                                   $"Стоимость работы: {part.CostWork}.\n" +
-                                  $"И того с вас: {part.CostWork + part.Price}");
-                _money += car.GiveMoney(part.Price + part.CostWork);
+                                  $"И того с вас: {serviceCost}");
+
+                if (car.HavePayService(serviceCost))
+                    _money += serviceCost;
+            }
+            else
+            {
+                float fine = 20;
+
+                Console.WriteLine("Приносим свои извинения но такой запчасти нет на складе. " +
+                                  $"Вам будет выплачена сумма равная: {fine}");
+                car.GetMoney(fine);
+                _money -= fine;
             }
 
             Console.WriteLine("Спасибо что посетили наш сервис.\n");
@@ -75,23 +72,33 @@ namespace TasksForJunior
             Create();
         }
 
+        public bool HaveSparePart(string name)
+        {
+            bool haveSparePart = false;
+
+            foreach (var container in _containers)
+            {
+                if (container.Name == name && container.Amount > 0)
+                {
+                    haveSparePart = true;
+                    Console.WriteLine("Деталь имеется.");
+                }
+            }
+
+            return haveSparePart;
+        }
+
         public Part GetPart(string name)
         {
             Part getPart = new Part();
 
             foreach (var container in _containers)
             {
-                if (container.Name == name && container.Amount > 0)
+                if (container.Name == name)
                 {
                     getPart = container.Part;
                     container.ReduceNumberParts();
-                    Console.WriteLine("Деталь имеется.");
                 }
-            }
-
-            if (getPart.Name == null)
-            {
-                Console.WriteLine("Детали нет.");
             }
 
             return getPart;
@@ -136,13 +143,10 @@ namespace TasksForJunior
 
     class Part
     {
-        private float _factorWork = 0.2f; 
-        public Part()
-        {
-            Price = 0;
-            Name = null;
-            CostWork = 10;
-        }
+        private float _factorWork = 0.2f;
+
+        public Part() { }
+
         public Part(float price, string name)
         {
             Price = price;
@@ -174,16 +178,16 @@ namespace TasksForJunior
             Money += money;
         }
 
-        public float GiveMoney(float money)
+        public bool HavePayService(float money)
         {
             if (Money >= money)
             {
                 Money -= money;
-                return money;
+                return true;
             }
             else
             {
-                return 0f;
+                return false;
             }
         }
     }
