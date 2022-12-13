@@ -37,7 +37,7 @@ namespace TasksForJunior
 
             if (_stock.HaveSparePart(car.NamePart))
             {
-                Part part = _stock.GetPart(car.NamePart);
+                Part part = _stock.TakePart(car.NamePart);
                 float serviceCost = part.CostWork + part.Price;
 
                 Console.WriteLine($"Была заменена деталь: {part.Name}.\n" +
@@ -45,16 +45,19 @@ namespace TasksForJunior
                                   $"Стоимость работы: {part.CostWork}.\n" +
                                   $"И того с вас: {serviceCost}");
 
-                if (car.HavePayService(serviceCost))
+                if (car.CanPay(serviceCost))
+                {
                     _money += serviceCost;
+                    car.Pay(serviceCost);
+                }
             }
             else
             {
                 float fine = 20;
 
-                Console.WriteLine("Приносим свои извинения но такой запчасти нет на складе. " +
+                Console.WriteLine("Приносим свои извинения, но такой запчасти нет на складе. " +
                                   $"Вам будет выплачена сумма равная: {fine}");
-                car.GetMoney(fine);
+                car.AcceptMoney(fine);
                 _money -= fine;
             }
 
@@ -81,16 +84,16 @@ namespace TasksForJunior
                 if (container.Name == name && container.Amount > 0)
                 {
                     haveSparePart = true;
-                    Console.WriteLine("Деталь имеется.");
+                    Console.WriteLine("Запчасть имеется.");
                 }
             }
 
             return haveSparePart;
         }
 
-        public Part GetPart(string name)
+        public Part TakePart(string name)
         {
-            Part getPart = new Part();
+            Part getPart = null;
 
             foreach (var container in _containers)
             {
@@ -123,29 +126,18 @@ namespace TasksForJunior
             Amount = amount;
         }
 
-        public string Name
-        {
-            get
-            {
-                return Part.Name;
-            }
-        }
+        public string Name => Part.Name;
 
         public Part Part { get; }
 
         public int Amount { get; private set; }
 
-        public void ReduceNumberParts()
-        {
-            Amount--;
-        }
+        public void ReduceNumberParts() => Amount--;
     }
 
     class Part
     {
         private float _factorWork = 0.2f;
-
-        public Part() { }
 
         public Part(float price, string name)
         {
@@ -173,22 +165,10 @@ namespace TasksForJunior
 
         public float Money { get; private set; }
 
-        public void GetMoney(float money)
-        {
-            Money += money;
-        }
+        public void AcceptMoney(float money) => Money += money;
 
-        public bool HavePayService(float money)
-        {
-            if (Money >= money)
-            {
-                Money -= money;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        public bool CanPay(float money) => Money >= money;
+
+        public void Pay(float money) => Money -= money;
     }
 }
