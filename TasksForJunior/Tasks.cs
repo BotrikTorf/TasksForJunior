@@ -62,27 +62,27 @@ namespace TasksForJunior
         }
 
         class Criminal
-    {
-        public Criminal(string surname, string name, string middleName, string crime)
         {
-            Surname = surname;
-            Name = name;
-            MiddleName = middleName;
-            Crime = crime;
-        }
+            public Criminal(string surname, string name, string middleName, string crime)
+            {
+                Surname = surname;
+                Name = name;
+                MiddleName = middleName;
+                Crime = crime;
+            }
 
-        public string Surname { get; }
+            public string Surname { get; }
 
-        public string Name { get; }
+            public string Name { get; }
 
-        public string MiddleName { get; }
+            public string MiddleName { get; }
 
-        public string Crime { get; }
+            public string Crime { get; }
 
-        public void Show()
-        {
-            Console.WriteLine($"{Surname} {Name} {MiddleName} - {Crime}");
+            public void Show()
+            {
+                Console.WriteLine($"{Surname} {Name} {MiddleName} - {Crime}");
+            }
         }
     }
-}
 }
