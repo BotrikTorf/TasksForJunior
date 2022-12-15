@@ -39,7 +39,7 @@ namespace TasksForJunior
 
             var showCriminals = from criminal in criminals
                 where criminal.Growth == growth && criminal.Weight == weight && 
-                      criminal.Nationality == nationality && criminal.Imprisoned == false
+                      criminal.Nationality == nationality && criminal.HaveImprisoned == false
                 select criminal;
 
             foreach (var criminal in showCriminals)
@@ -52,13 +52,13 @@ namespace TasksForJunior
     class Criminal
     {
         public Criminal
-            (string surname, string name, string middleName, bool imprisoned, 
+            (string surname, string name, string middleName, bool haveImprisoned, 
                 int growth, int weight, string nationality)
         {
             Surname = surname;
             Name = name;
             MiddleName = middleName;
-            Imprisoned = imprisoned;
+            HaveImprisoned = haveImprisoned;
             Growth = growth;
             Weight = weight;
             Nationality = nationality;
@@ -70,7 +70,7 @@ namespace TasksForJunior
 
         public string MiddleName { get; }
 
-        public bool Imprisoned { get; }
+        public bool HaveImprisoned { get; }
 
         public int Growth { get; }
 
