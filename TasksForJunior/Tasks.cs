@@ -25,44 +25,32 @@ namespace TasksForJunior
                 string value = Console.ReadLine();
 
                 if (value == ConstFullName)
-                {
-                    ShowFullName(patients);
-                }
+                    ShowSortedListFullName(patients);
                 else if (value == ConstAge)
-                {
-                    ShowAge(patients);
-                }
+                    ShowSortedListAge(patients);
                 else if (value == ConstExit)
-                {
                     isWork = false;
-                }
                 else
-                {
-                    ShowPatients(patients, value);
-                }
+                    ShowListPatientsDisease(patients, value);
             }
         }
 
-        private static void ShowPatients(List<Patient> patients, string value)
+        private static void ShowListPatientsDisease(List<Patient> patients, string value)
         {
             var showPatients = patients.Where(patient => patient.Disease == value);
             Show(showPatients.ToList());
         }
 
-        private static void ShowAge(List<Patient> patients)
+        private static void ShowSortedListAge(List<Patient> patients)
         {
             var showPatients = patients.OrderBy(patient => patient.Age);
             Show(showPatients.ToList());
         }
 
-        private static void ShowFullName(List<Patient> patients)
+        private static void ShowSortedListFullName(List<Patient> patients)
         {
-            //var showPatients = from patient in patients
-            //                   orderby patient.Surname, patient.Name, patient.MiddleName
-            //                   select patient;
-
-            var showPatients = patients.OrderBy(patient => patient.MiddleName).OrderBy(patient => patient.Name)
-                .OrderBy(patient => patient.Surname);
+            var showPatients = patients.OrderBy(patient => patient.Surname).ThenBy(patient => patient.Name)
+                .ThenBy(patient => patient.MiddleName);
 
             Show(showPatients.ToList());
         }
@@ -70,12 +58,12 @@ namespace TasksForJunior
         private static List<Patient> CreateListPatients()
         {
             List<string> surnames = new List<string>
-                { "Иванов", "Смирнов", "Кузнецов", "Попов", "Васильев", "Петров", "Соколов", "Михайлов" };
+                { "Аксаков", "Бажов", "Гоголь", "Есенин", "Жуковский", "Лермонтов", "Маршак", "Некрасов" };
             List<string> names = new List<string>
-                { "Александр", "Алексей", "Андрей", "Артем", "Виктор", "Даниил", "Дмитрий", "Егор" };
+                { "Александр", "Борис", "Виктор", "Георгий", "Даниил", "Евгений", "Жак", "Иван" };
             List<string> middleNames = new List<string>
-            { "Александрович", "Алексеевич", "Андреевич", "Анатольевич", "Викторович", "Данилович", "Дмитриевич",
-                "Егорович" };
+            { "Александрович", "Борисович", "Викторович", "Гкоргиевич", "Данилович", "Евгениевич",
+                "Иванович" };
             List<string> diseases = new List<string>
                 { "Сахарный диабет", "Заболевания легких", "Болезнь почек", "Анемия", "Дефицит железа" };
             List<Patient> patients = new List<Patient>();
@@ -99,13 +87,10 @@ namespace TasksForJunior
 
         static void Show(List<Patient> patients)
         {
-            int number = 1;
-
-            foreach (var patient in patients)
+            for (int i = 0; i < patients.Count; i++)
             {
-                Console.Write($"{number:000}. ");
-                patient.Show();
-                number++;
+                Console.Write($"{i + 1:000}. ");
+                patients[i].Show();
             }
 
             Console.WriteLine();
