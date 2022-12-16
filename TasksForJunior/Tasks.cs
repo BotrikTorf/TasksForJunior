@@ -10,7 +10,10 @@ namespace TasksForJunior
         {
             List<Player> players = CreateListPlayers();
 
-
+            var sortLevel = players.OrderByDescending(player => player.Level);
+            Show(sortLevel.ToList());
+            var sortString = players.OrderByDescending(player => player.Strength);
+            Show(sortString.ToList());
         }
 
         private static List<Player> CreateListPlayers()
@@ -22,15 +25,15 @@ namespace TasksForJunior
             int count = 100;
             int minLevel = 1;
             int maxLevel = 100;
-            int minStrength = 0;
-            int maxStrength = 10000;
+            int minStrength = 10;
+            int maxStrength = 100;
 
             for (int i = 0; i < count; i++)
             {
-                players.Add(new Player(
-                    names[random.Next(0, names.Count)],
-                    random.Next(minLevel, maxLevel + 1),
-                    random.Next(minStrength, maxStrength + 1)));
+                int level = random.Next(minLevel, maxLevel + 1);
+                int strength = random.Next(minStrength, maxStrength + 1) * level;
+
+                players.Add(new Player(names[random.Next(0, names.Count)], level, strength));
             }
 
             return players;
@@ -38,9 +41,10 @@ namespace TasksForJunior
 
         static void Show(List<Player> players)
         {
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Console.Write($"{i + 1:000}. ");
+                players[i].Show();
             }
 
             Console.WriteLine();
@@ -61,5 +65,10 @@ namespace TasksForJunior
         public int Level { get; }
 
         public int Strength { get; }
+
+        public void Show()
+        {
+            Console.WriteLine($"Ник: {Name}, уровень: {Level}, сила игрока: {Strength}");
+        }
     }
 }
