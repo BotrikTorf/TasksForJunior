@@ -31,13 +31,13 @@ namespace TasksForJunior
                 else if (value == ConstExit)
                     isWork = false;
                 else
-                    ShowListPatientsDisease(patients, value);
+                    ShowPatientsDiagnosed(patients, value);
             }
         }
 
-        private static void ShowListPatientsDisease(List<Patient> patients, string value)
+        private static void ShowPatientsDiagnosed(List<Patient> patients, string value)
         {
-            var showPatients = patients.Where(patient => patient.Disease == value);
+            var showPatients = patients.Where(patient => patient.Diagnosis == value);
             Show(showPatients.ToList());
         }
 
@@ -64,7 +64,7 @@ namespace TasksForJunior
             List<string> middleNames = new List<string>
             { "Александрович", "Борисович", "Викторович", "Гкоргиевич", "Данилович", "Евгениевич",
                 "Иванович" };
-            List<string> diseases = new List<string>
+            List<string> diagnosis = new List<string>
                 { "Сахарный диабет", "Заболевания легких", "Болезнь почек", "Анемия", "Дефицит железа" };
             List<Patient> patients = new List<Patient>();
             Random random = new Random();
@@ -78,7 +78,7 @@ namespace TasksForJunior
                     surnames[random.Next(0, surnames.Count)],
                     names[random.Next(0, names.Count)],
                     middleNames[random.Next(0, middleNames.Count)],
-                    diseases[random.Next(0, diseases.Count)],
+                    diagnosis[random.Next(0, diagnosis.Count)],
                     random.Next(minAge, maxAge + 1)));
             }
 
@@ -99,12 +99,12 @@ namespace TasksForJunior
 
     class Patient
     {
-        public Patient(string surname, string name, string middleName, string disease, int age)
+        public Patient(string surname, string name, string middleName, string diagnosis, int age)
         {
             Surname = surname;
             Name = name;
             MiddleName = middleName;
-            Disease = disease;
+            Diagnosis = diagnosis;
             Age = age;
         }
 
@@ -114,13 +114,13 @@ namespace TasksForJunior
 
         public string MiddleName { get; }
 
-        public string Disease { get; }
+        public string Diagnosis { get; }
 
         public int Age { get; }
 
         public void Show()
         {
-            Console.WriteLine($"{Surname} {Name} {MiddleName}, {Age} лет, болезнь: {Disease}");
+            Console.WriteLine($"{Surname} {Name} {MiddleName}, {Age} лет, болезнь: {Diagnosis}");
         }
     }
 }
