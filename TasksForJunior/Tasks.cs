@@ -8,7 +8,68 @@ namespace TasksForJunior
     {
         static void Main()
         {
+            List<Soldier> soldiers = CreateSolders();
 
+            var nameRank = soldiers.Select(soldier => new { Name = soldier.FullName, soldier.Rank }).
+                OrderBy(soldier => soldier.Name).ToList();
+
+            for (int i = 0; i < nameRank.Count(); i++)
+            {
+                Console.WriteLine($"{i:000}. {nameRank[i].Name} - звание {nameRank[i].Rank}");
+            }
         }
+
+        static List<Soldier> CreateSolders()
+        {
+            List<Soldier> soldiers = new List<Soldier>();
+            Random random = new Random();
+            List<string> surnames = new List<string>
+                { "Аксаков", "Бажов", "Гоголь", "Есенин", "Жуковский", "Лермонтов", "Маршак", "Некрасов" };
+            List<string> names = new List<string>
+                { "Александр", "Борис", "Виктор", "Георгий", "Даниил", "Евгений", "Жак", "Иван" };
+            List<string> middleNames = new List<string>
+            { "Александрович", "Борисович", "Викторович", "Гкоргиевич", "Данилович", "Евгениевич",
+                "Иванович" };
+            List<string> armaments = new List<string>
+                { "СПС Гюрза", "Пулемет Печенег", "ВСС Винторез", "АН-94 Абакан", "Автомат АК-74М",
+                    "Пулемет НСВ", "Винтовка СВД", "Пулемет РПК" };
+            List<string> rank = new List<string>
+                { "Рядовой", "Ефрейтор", "Младший сержант", "Сержант", "Старший сержант", "Старшина" };
+            int minMilitaryService = 0;
+            int maxMilitaryService = 18;
+            int count = 100;
+
+            for (int i = 0; i < count; i++)
+            {
+                soldiers.Add(new Soldier(
+                    surnames[random.Next(0, surnames.Count)] + " " + 
+                        names[random.Next(0, names.Count)] + " " + 
+                        middleNames[random.Next(0, middleNames.Count)],
+                    armaments[random.Next(0, armaments.Count)],
+                    rank[random.Next(0, rank.Count)],
+                    random.Next(minMilitaryService, maxMilitaryService)));
+            }
+
+            return soldiers;
+        }
+    }
+
+    class Soldier
+    {
+        public Soldier(string fullName, string armament, string rank, int militaryService)
+        {
+            FullName = fullName;
+            Armament = armament;
+            Rank = rank;
+            MilitaryService = militaryService;
+        }
+
+        public string FullName { get; }
+
+        public string Armament { get; }
+
+        public string Rank { get; }
+
+        public int MilitaryService { get; }
     }
 }
