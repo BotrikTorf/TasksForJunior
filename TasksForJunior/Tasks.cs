@@ -9,10 +9,12 @@ namespace TasksForJunior
         static void Main()
         {
             List<Player> players = CreateListPlayers();
+            int numberPleyers = 3;
 
-            var sortLevel = players.OrderByDescending(player => player.Level);
+
+            var sortLevel = players.OrderByDescending(player => player.Level).Take(numberPleyers);
             Show(sortLevel.ToList());
-            var sortString = players.OrderByDescending(player => player.Strength);
+            var sortString = players.OrderByDescending(player => player.Strength).Take(numberPleyers);
             Show(sortString.ToList());
         }
 
@@ -41,7 +43,7 @@ namespace TasksForJunior
 
         static void Show(List<Player> players)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < players.Count; i++)
             {
                 Console.Write($"{i + 1:000}. ");
                 players[i].Show();
