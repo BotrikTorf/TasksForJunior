@@ -18,25 +18,24 @@ namespace TasksForJunior
 
     class Stock
     {
-        private List<Product> products;
-        public Stock() => products = CreateListProducts();
+        private List<Product> _products = new List<Product>();
+
+        public Stock() => CreateListProducts();
 
         public void ShowExpiredProduct(int year)
         {
-            var expiredProduct = products.Where(product => (product.Year + product.ExpirationDate) < year);
+            var expiredProduct = _products.Where(product => (product.Year + product.ExpirationDate) < year).ToList();
 
             for (int i = 0; i < expiredProduct.Count(); i++)
             {
-
                 Console.Write($"{i + 1:000}. ");
-                products[i].Show();
+                expiredProduct[i].Show();
             }
         }
 
-        private List<Product> CreateListProducts()
+        private void CreateListProducts()
         {
-            List<Product> products = new List<Product>();
-            int count = 1000;
+            int count = 100;
             int minYear = 1999;
             int maxYear = 2020;
             int minExpirationDate = 2;
@@ -46,10 +45,8 @@ namespace TasksForJunior
                 { "Тушенка из говядины", "Тушенка из свинины", "Мясные консервы из курицы", "Маринованая кукуруза" , "Рыбные консервы"};
 
             for (int i = 0; i < count; i++)
-                products.Add(new Product(names[random.Next(0, names.Count)],
-                    random.Next(minYear, maxYear), random.Next(minExpirationDate, maxExpirationDate)));
-
-            return products;
+                _products.Add(new Product(names[random.Next(0, names.Count)], random.Next(minYear, maxYear), 
+                    random.Next(minExpirationDate, maxExpirationDate)));
         }
     }
 
