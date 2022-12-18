@@ -11,7 +11,6 @@ namespace TasksForJunior
             List<Player> players = CreateListPlayers();
             int numberPleyers = 3;
 
-
             var sortLevel = players.OrderByDescending(player => player.Level).Take(numberPleyers);
             Show(sortLevel.ToList());
             var sortString = players.OrderByDescending(player => player.Strength).Take(numberPleyers);
