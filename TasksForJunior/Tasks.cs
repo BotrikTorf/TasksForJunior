@@ -15,9 +15,9 @@ namespace TasksForJunior
             Show(soldiersSecond.OrderBy(soldier => soldier.Surname).ToList());
 
             var temp = soldiersFirst.Where(soldier => soldier.Surname.StartsWith("Б")).
-                OrderBy(soldier => soldier.Surname);
-            soldiersFirst= soldiersFirst.Where(solder => solder.Surname[0] != 'Б').ToList();
+                OrderBy(soldier => soldier.Surname).ToList();
             soldiersSecond = soldiersSecond.Union(temp).ToList();
+            soldiersFirst = soldiersFirst.Except(temp).ToList();
             Show(soldiersFirst.OrderBy(soldier => soldier.Surname).ToList());
             Show(soldiersSecond.OrderBy(soldier => soldier.Surname).ToList());
         }
@@ -40,7 +40,7 @@ namespace TasksForJunior
                 { "Рядовой", "Ефрейтор", "Младший сержант", "Сержант", "Старший сержант", "Старшина" };
             int minMilitaryService = 0;
             int maxMilitaryService = 18;
-            int count = 50;
+            int count = 10;
 
             for (int i = 0; i < count; i++)
             {
